@@ -1,16 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <!-- iOS / Android 主畫面圖示設定 -->
-    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
-    <meta name="apple-mobile-web-app-title" content="大阪手冊">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本大阪行手冊</title>
+    <title>大阪自由行隨身手冊 (共編同步版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -31,536 +24,280 @@
                 margin-bottom: 2rem !important; 
                 padding: 1.5rem !important;
             }
-            .print-header { display: block !important; text-align: center; margin-bottom: 1rem; }
         }
+        
+        /* 隱藏捲軸但可滑動 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="text-gray-800 pb-12">
 
-    <!-- 頂部標題與工具列 -->
     <header class="bg-red-800 text-white shadow-md sticky top-0 z-50 no-print">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-book-bookmark text-xl"></i>
-                <h1 class="font-bold text-lg">大阪自由行隨身小書</h1>
+                <i class="fa-solid fa-cloud-arrow-down text-xl"></i>
+                <h1 class="font-bold text-lg tracking-wide">大阪自由行 <span class="text-xs bg-red-600 px-1.5 py-0.5 rounded ml-1">即時同步版</span></h1>
             </div>
             <button id="printBtn" type="button" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-3.5 py-2 rounded-lg border border-red-500 flex items-center gap-1.5 transition shadow-sm active:scale-95">
-                <i class="fa-solid fa-print"></i> 列印 / 儲存 PDF
+                <i class="fa-solid fa-print"></i> 儲存 PDF
             </button>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-4 pt-4 main-container">
 
-        <!-- 導覽切換選單（修正樣式與對比度） -->
-        <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-print text-sm border border-gray-200">
+        <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200" id="main-nav">
             <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">行前與住宿</button>
             <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
             <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運 vs 隨身</button>
             <button onclick="switchTab('vjw')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-vjw">VJW 填寫</button>
-            <button onclick="switchTab('day1')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-day1">D1(六)</button>
-            <button onclick="switchTab('day2')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-day2">D2(日)</button>
-            <button onclick="switchTab('day3')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-day3">D3(一)</button>
-            <button onclick="switchTab('day4')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-day4">D4(二)</button>
-            <button onclick="switchTab('day5')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-day5">D5(三)</button>
+            
+            <div id="loading-indicator" class="flex-1 py-2 px-3.5 text-center text-gray-400 text-xs font-bold flex items-center justify-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-spinner fa-spin"></i> 正在同步試算表...
+            </div>
         </nav>
 
-        <!-- 護照安全警告標語 (固定顯示) -->
         <div class="bg-amber-50 border-l-4 border-amber-500 p-3.5 mb-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start space-x-3">
             <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5 shrink-0"></i>
             <div>
                 <span class="font-bold">重要安全提示：護照必須全程隨身攜帶，切勿離身！</span>
-                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身攜帶護照以備查驗；辦理免稅購物亦需出示護照正本（影本不可）。請勿放在飯店或托運行李中。</p>
+                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身攜帶護照以備查驗，影本無效。請勿放在飯店或托運行李中。</p>
             </div>
         </div>
 
-        <!-- PAGE 1: 航班、住宿與周遊券 -->
         <section id="tab-overview" class="tab-content print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-red-800 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-plane"></i> 航班與住宿資訊
                 </h2>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
                     <div class="bg-red-50 p-3.5 rounded-xl border border-red-100">
                         <div class="text-xs text-red-600 font-bold mb-1">✈️ 去程航班 (10/17 六)</div>
                         <div class="font-bold text-gray-800 text-base">台灣虎航 IT710</div>
                         <div class="text-gray-700">07:45 桃園機場 T1 ➔ 11:30 關西機場 T1</div>
-                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">
-                            🚨 最晚 04:30 前須抵達桃園機場櫃檯
-                        </div>
+                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">🚨 最晚 04:30 前須抵達櫃檯</div>
                     </div>
-                    
                     <div class="bg-red-50 p-3.5 rounded-xl border border-red-100">
                         <div class="text-xs text-red-600 font-bold mb-1">✈️ 回程航班 (10/21 三)</div>
                         <div class="font-bold text-gray-800 text-base">台灣虎航 IT213</div>
                         <div class="text-gray-700">21:05 關西機場 T1 ➔ 23:00 桃園機場 T1</div>
-                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">
-                            🚨 17:00 啟程前往機場，18:00 前辦理報到
-                        </div>
+                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">🚨 17:00 離開市區，18:00 前抵達機場</div>
                     </div>
                 </div>
-
                 <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1">
                     <div class="text-xs text-gray-500 font-bold">🏨 住宿資訊（連續入住 4 晚）</div>
                     <div class="font-bold text-gray-900 text-base">嵐 Hotel Arashi 日本橋 2 號店 (No.008)</div>
-                    <div class="text-gray-700"><span class="font-medium">英文名稱：</span>Hotel Arashi Nippombashi 2 No.008</div>
-                    <div class="text-gray-700"><span class="font-medium">日文地址：</span>大阪府大阪市浪速区日本橋5-6-19 (郵遞區號: 556-0005)</div>
-                    <div class="text-gray-700"><span class="font-medium">交通指引：</span>地下鐵堺筋線【惠美須町站】1-A 或 2 號出口步行即達</div>
-                    <div class="text-gray-500 text-xs pt-1">入住時間：16:00 Check-in / 退房時間：11:00 Check-out</div>
-                </div>
-            </div>
-
-            <!-- 周遊券重點提醒 -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
-                <h2 class="text-lg font-bold text-red-800 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-ticket"></i> 周遊券使用注意事項
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
-                    <div class="p-2.5 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-red-700">1. 梅田藍天大廈空中庭園：</span>
-                        <p class="text-xs mt-0.5">周遊券優惠限 **15:00 前** 入場免費，超過時間需自費。</p>
-                    </div>
-                    <div class="p-2.5 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-gray-900">2. 道頓堀觀光遊船：</span>
-                        <p class="text-xs mt-0.5">不可預約熱門時段，須於當天至現場售票處換取指定班次船票。</p>
-                    </div>
-                    <div class="p-2.5 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-gray-900">3. 週二休館特別注意：</span>
-                        <p class="text-xs mt-0.5">大阪生活今昔館、絹谷幸二天空美術館每週二定休。</p>
-                    </div>
-                    <div class="p-2.5 bg-gray-50 rounded-lg">
-                        <span class="font-bold text-gray-900">4. 勝尾寺交通路線：</span>
-                        <p class="text-xs mt-0.5">乘御堂筋線至「箕面萱野站」，再轉乘公車或計程車前往勝尾寺。</p>
-                    </div>
+                    <div class="text-gray-700"><span class="font-medium">地址：</span>大阪府大阪市浪速区日本橋5-6-19 (556-0005)</div>
+                    <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A 或 2 號出口即達</div>
+                    <div class="text-gray-500 text-xs pt-1">入住：16:00 Check-in / 退房：11:00 Check-out</div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE 2: 詳細行李打包檢查單 -->
         <section id="tab-checklist" class="tab-content hidden print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-clipboard-check text-red-800"></i> 詳細打包與行前檢查表
                 </h2>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <!-- 必帶證件與重要物品 -->
                     <div class="border p-3.5 rounded-xl">
-                        <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件與財物（請務必複查）</h3>
+                        <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件與財物</h3>
                         <div class="space-y-1.5 text-gray-700">
                             <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span class="font-bold text-red-700">護照正本（效期需在 6 個月以上）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>日圓現金（建議準備少許硬幣與千圓鈔）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>海外刷卡信用卡（建議準備 2 張以上備用）</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>海外刷卡信用卡（建議準備 2 張）</span></label>
                             <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>ICOCA 或 Suica 交通卡</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>機票電子憑證 / 飯店預訂確認單</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>Visit Japan Web QR Code（可截圖備用）</span></label>
                         </div>
                     </div>
-
-                    <!-- 電子產品 -->
                     <div class="border p-3.5 rounded-xl">
                         <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">🔌 3C 電子產品</h3>
                         <div class="space-y-1.5 text-gray-700">
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>智慧型手機與充電線</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>行動電源（容量符合規定，隨身攜帶）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>日本網卡 (eSIM / 實體 SIM 卡 / Wi-Fi 機)</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>手機、網卡與充電線</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span class="font-bold">行動電源（容量符合規定，隨身攜帶）</span></label>
                             <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>多孔充電頭 / 延長線</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>相機、記憶卡、備用電池</span></label>
-                        </div>
-                    </div>
-
-                    <!-- 衣物與個人用品 -->
-                    <div class="border p-3.5 rounded-xl">
-                        <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">👔 穿搭與個人用品</h3>
-                        <div class="space-y-1.5 text-gray-700">
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>天候適應衣物（保暖外套/易洋蔥式穿搭）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span class="font-bold text-gray-900">極舒適好走的運動鞋（每日平均步數 1.5萬+）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>個人常備藥物（腸胃藥、止痛藥、感冒藥）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>摺疊雨傘 / 輕便雨衣</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>個人盥洗用品 / 保濕保養品</span></label>
-                        </div>
-                    </div>
-
-                    <!-- 貼心隨身小物 -->
-                    <div class="border p-3.5 rounded-xl">
-                        <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">🎒 貼心隨身裝備</h3>
-                        <div class="space-y-1.5 text-gray-700">
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>零錢包（日本消費硬幣極多，必備！）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>可摺疊購物袋 / 環保袋（買伴手禮好用）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>小包濕紙巾 / 衛生紙（日本路上垃圾桶少）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>休足時間 / 貼布（舒緩腿部疲勞）</span></label>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE 3: 托運 vs 隨身行李規範 -->
         <section id="tab-baggage" class="tab-content hidden print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-plane-luggage text-red-800"></i> 行李打包分流指南（托運 vs 隨身）
+                    <i class="fa-solid fa-plane-luggage text-red-800"></i> 行李打包分流指南
                 </h2>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <!-- 必須隨身攜帶 (絕對不可托運) -->
                     <div class="bg-red-50 border border-red-200 p-4 rounded-xl space-y-2">
-                        <div class="font-bold text-red-800 text-base flex items-center gap-1.5">
-                            <i class="fa-solid fa-person-walking-luggage"></i> 必須放置於【隨身行李】
-                        </div>
-                        <p class="text-xs text-red-700 font-semibold">放托運會在安檢時被關心或強制要求退回開箱！</p>
+                        <div class="font-bold text-red-800 text-base flex items-center gap-1.5"><i class="fa-solid fa-person-walking-luggage"></i> 必須【隨身攜帶】</div>
                         <ul class="list-disc list-inside space-y-1 text-gray-700 text-xs">
-                            <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>任何容量之行動電源皆禁止托運。</li>
-                            <li><strong class="text-red-800">重要證件與財物：</strong>護照、現金、信用卡、貴重珠寶。</li>
-                            <li><strong class="text-red-800">電子產品備用電池：</strong>相機電池、空拍機電池。</li>
-                            <li><strong class="text-gray-900">打火機：</strong>每人限隨身攜帶 1 個普通打火機（防風/藍焰打火機禁止上機）。</li>
-                            <li><strong class="text-gray-900">精密電子設備：</strong>筆記型平版電腦、高單價相機鏡頭。</li>
-                            <li><strong class="text-gray-900">個人常備藥品：</strong>慢性病藥物、急救藥品。</li>
+                            <li><strong class="text-red-800">行動電源 / 鋰電池</strong> (絕對禁止托運)</li>
+                            <li><strong class="text-red-800">重要證件與財物現金</strong></li>
+                            <li>打火機 (每人限 1 個普通打火機)</li>
                         </ul>
                     </div>
-
-                    <!-- 必須托運 (不可隨身) -->
                     <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl space-y-2">
-                        <div class="font-bold text-blue-900 text-base flex items-center gap-1.5">
-                            <i class="fa-solid fa-suitcase"></i> 必須放置於【托運行李】
-                        </div>
-                        <p class="text-xs text-blue-800 font-semibold">過安檢會被直接沒收丟棄！</p>
+                        <div class="font-bold text-blue-900 text-base flex items-center gap-1.5"><i class="fa-solid fa-suitcase"></i> 必須【托運】</div>
                         <ul class="list-disc list-inside space-y-1 text-gray-700 text-xs">
-                            <li><strong class="text-blue-900">超過 100ml 的液體/膏狀物：</strong>飲料、保養品、牙膏、洗面乳、罐頭、布丁果凍等（單罐超過100ml即不可隨身）。</li>
-                            <li><strong class="text-blue-900">尖銳與金屬工具類：</strong>剪刀、指甲剪、修眉刀、瑞士刀、水果刀。</li>
-                            <li><strong class="text-blue-900">長柄傘 / 腳架：</strong>管徑超過 1 公分或收合後長度超過 60 公分之腳架、長傘。</li>
-                            <li><strong class="text-blue-900">噴霧罐：</strong>超過 100ml 之防曬噴霧、定型噴霧。</li>
+                            <li><strong class="text-blue-900">大於 100ml 的液體/膏狀物/果凍</strong></li>
+                            <li><strong class="text-blue-900">剪刀、指甲剪、水果刀等尖銳物</strong></li>
+                            <li>長度超過 60 公分之腳架或長傘</li>
                         </ul>
                     </div>
-                </div>
-
-                <div class="mt-4 bg-gray-50 p-3 rounded-lg border text-xs text-gray-600 space-y-1">
-                    <div class="font-bold text-gray-800">💡 虎航行李小提醒：</div>
-                    <div>• 隨身手提行李：每人限 2 件（包含 1 件手提行李 + 1 件隨身包），總重量不得超過 10 公斤。</div>
-                    <div>• 托運行李：無件數限制，但單件重量不得超過 30 公斤，團體可合併計重。</div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE 4: Visit Japan Web 填寫指南 -->
         <section id="tab-vjw" class="tab-content hidden print-page space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-qrcode text-red-800"></i> Visit Japan Web (VJW) 填寫教學與範例
+                    <i class="fa-solid fa-qrcode text-red-800"></i> Visit Japan Web (VJW) 住宿資料
                 </h2>
-
-                <div class="space-y-4 text-sm">
-                    <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-900">
-                        <span class="font-bold">建議於出發前 3 天完成線上填寫！</span>
-                        填寫完畢後會產生入境審查與海關申報的二合一 QR Code，請儲存或截圖至手機相簿。
-                    </div>
-
-                    <!-- 日本聯絡地址填寫範例 -->
-                    <div class="border rounded-xl p-4 bg-gray-50 space-y-2">
-                        <div class="font-bold text-gray-900 border-b pb-1">📍 日本入境填寫資訊（住宿範例）</div>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <span class="text-gray-500 block">都道府縣 (Prefecture)：</span>
-                                <span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Osaka (大阪府)</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 block">市区町村 (City)：</span>
-                                <span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Naniwa-ku, Osaka-shi (浪速區)</span>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <span class="text-gray-500 block">町名札地 (Address / Street)：</span>
-                                <span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">5-6-19 Nipponbashi</span>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <span class="text-gray-500 block">飯店名稱 (Hotel Name)：</span>
-                                <span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Hotel Arashi Nippombashi 2 No.008</span>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <span class="text-gray-500 block">日本聯絡電話 (Japanese Phone Number)：</span>
-                                <span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">+81 6-6631-0008 (或填寫飯店聯絡電話/個人漫遊電話)</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 步驟指引 -->
-                    <div class="space-y-2 text-xs text-gray-700">
-                        <div class="font-bold text-gray-900 text-sm">📲 填寫四步驟：</div>
-                        <ol class="list-decimal list-inside space-y-1.5 bg-white p-3 rounded-xl border">
-                            <li>進入官方網站 <span class="text-blue-600 underline font-mono">vjw-lp.digital.go.jp</span> 並註冊/登入帳號。</li>
-                            <li>新增本人資料（填寫護照資料、確認免簽入境）。</li>
-                            <li>新增登錄預定入境時間（填寫抵達日期 10/17、航空公司 IT、航班號 710）。</li>
-                            <li>填寫「入境審查及海關申報」，完成後儲存包含青黃色條紋的 **QR Code**。</li>
-                        </ol>
+                <div class="border rounded-xl p-4 bg-gray-50 space-y-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div><span class="text-gray-500 block">都道府縣：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Osaka (大阪府)</span></div>
+                        <div><span class="text-gray-500 block">市区町村：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Naniwa-ku, Osaka-shi</span></div>
+                        <div class="sm:col-span-2"><span class="text-gray-500 block">町名札地 (Address)：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">5-6-19 Nipponbashi</span></div>
+                        <div class="sm:col-span-2"><span class="text-gray-500 block">飯店名稱 (Hotel Name)：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Hotel Arashi Nippombashi 2 No.008</span></div>
+                        <div class="sm:col-span-2"><span class="text-gray-500 block">日本聯絡電話：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">+81 6-6631-0008</span></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE 5: Day 1 -->
-        <section id="tab-day1" class="tab-content hidden print-page space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center border-b pb-3 mb-4">
-                    <div>
-                        <span class="bg-red-800 text-white text-xs px-2.5 py-1 rounded-full font-bold">DAY 1</span>
-                        <h2 class="text-xl font-bold text-gray-900 inline ml-2">10/17 (六) 南區散策與難波商圈</h2>
-                    </div>
-                </div>
-
-                <div class="space-y-4 text-sm relative border-l-2 border-red-200 ml-3 pl-4">
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">04:30 前 桃園機場 T1 櫃檯集合報到</div>
-                        <div class="text-xs text-gray-600 mt-0.5">搭乘虎航 IT710 (07:45 起飛)。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">11:30 抵達關西機場 T1</div>
-                        <div class="text-xs text-gray-600 mt-0.5">搭乘「南海機場線」至【天下茶屋站】，轉乘地下鐵堺筋線(K線)至【惠美須町站】(1-A/2號出口)，步行至飯店寄放行李。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">午餐選項</div>
-                        <div class="text-xs text-gray-600 mt-0.5">大阪王將 或 拉麵なにわ新風（惠美須町店 3 號出口）。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">午後：天神橋筋商店街與大阪天滿宮</div>
-                        <div class="text-xs text-gray-600 mt-0.5">體驗全日本最長商店街（惠美須町站 ➔ 南森町站）。品嚐 WANAKA 章魚燒。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">16:00 飯店 Check-in 辦理入住</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">晚餐與夜間行程：新世界本通商店街</div>
-                        <div class="text-xs text-gray-600 mt-0.5">享用晚餐，體驗新世界懷舊氛圍（推薦 kankan 章魚燒）。</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGE 6: Day 2 -->
-        <section id="tab-day2" class="tab-content hidden print-page space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center border-b pb-3 mb-4">
-                    <div>
-                        <span class="bg-red-800 text-white text-xs px-2.5 py-1 rounded-full font-bold">DAY 2</span>
-                        <h2 class="text-xl font-bold text-gray-900 inline ml-2">10/18 (日) 勝尾寺祈福、梅田與心齋橋</h2>
-                    </div>
-                </div>
-
-                <div class="space-y-4 text-sm relative border-l-2 border-red-200 ml-3 pl-4">
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">08:00 前出發前往勝尾寺</div>
-                        <div class="text-xs text-gray-600 mt-0.5">搭乘堺筋線(K線) 轉 御堂筋線(M線) 至【箕面萱野站】(約1:20)，轉乘公車或計程車抵達勝尾寺。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">午餐：Tonkatsu KYK 豬排</div>
-                        <div class="text-xs text-gray-600 mt-0.5">阪急 32 番街店 (Hankyu 32nd Avenue Store)。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">午後：梅田商圈巡禮</div>
-                        <ul class="text-xs text-gray-600 mt-0.5 list-disc list-inside space-y-1">
-                            <li>hololive production official shop (阪急三番街 北館 B1)</li>
-                            <li>YONEX OSAKA SHOWROOM 羽球專賣店 (GRAND FRONT 大阪 南館 B1)</li>
-                            <li>新梅田食道街 (品嚐 HANAKO 章魚燒)</li>
-                            <li>參拜露天神社 (開放時間 06:00 – 23:00)</li>
-                        </ul>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">傍晚：心齋橋與難波逛街</div>
-                        <div class="text-xs text-gray-600 mt-0.5">心齋橋筋商店街、Apple 心齋橋、麥當勞(心齋橋南店)、Bic Camera 難波店、Round One 運動遊樂場。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">晚餐：国産牛燒肉食べ放題 あぶりや 千日前店</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGE 7: Day 3 -->
-        <section id="tab-day3" class="tab-content hidden print-page space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center border-b pb-3 mb-4">
-                    <div>
-                        <span class="bg-red-800 text-white text-xs px-2.5 py-1 rounded-full font-bold">DAY 3</span>
-                        <h2 class="text-xl font-bold text-gray-900 inline ml-2">10/19 (一) 大阪城歷史與港區海景</h2>
-                    </div>
-                </div>
-
-                <div class="space-y-4 text-sm relative border-l-2 border-red-200 ml-3 pl-4">
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">上午：大阪城公園與御座船</div>
-                        <div class="text-xs text-gray-600 mt-0.5">搭中央線(C線)至【谷町四丁目站】，參觀大阪城與搭乘大阪城御座船 (09:00 - 18:00)。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">中午：前往大阪港搭乘觀光船與摩天輪</div>
-                        <div class="text-xs text-gray-600 mt-0.5">堺筋本町轉中央線(C線)至【大阪港站】。體驗天保山大摩天輪 (10:00起) 與 聖瑪麗亞號 (11:00起)。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-red-700">⚠️ 15:00 前必須抵達：梅田藍天大廈</div>
-                        <div class="text-xs text-gray-600 mt-0.5">參觀絹谷幸二天空美術館與空中庭園展望台（周遊券免費入場限 15:00 前）。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">傍晚：大阪生活今昔館 (10:00 - 17:00)</div>
-                        <div class="text-xs text-gray-600 mt-0.5">乘 T 線東梅田 ➔ K 線天神橋筋六丁目站 3 號出口。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">晚餐：鳥貴族 串燒居酒屋</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGE 8: Day 4 -->
-        <section id="tab-day4" class="tab-content hidden print-page space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center border-b pb-3 mb-4">
-                    <div>
-                        <span class="bg-red-800 text-white text-xs px-2.5 py-1 rounded-full font-bold">DAY 4</span>
-                        <h2 class="text-xl font-bold text-gray-900 inline ml-2">10/20 (二) 天王寺文教與通天閣冒險</h2>
-                    </div>
-                </div>
-
-                <div class="space-y-4 text-sm relative border-l-2 border-red-200 ml-3 pl-4">
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">08:30 四天王寺參拜</div>
-                        <div class="text-xs text-gray-600 mt-0.5">開放時間：08:30 – 16:00。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">上午：天王寺動物園 + 大阪市立美術館</div>
-                        <div class="text-xs text-gray-600 mt-0.5">開放時間：09:30 – 17:00。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">下午：通天閣刺激體驗</div>
-                        <div class="text-xs text-gray-600 mt-0.5">展望台 + TOWER SLIDER 巨型溜滑梯 + Dive & Walk 笨豬跳 (開放時間 09:00 - 21:45)。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">傍晚：道頓堀遊船</div>
-                        <div class="text-xs text-gray-600 mt-0.5">請記得先至現場換領指定班次船票。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">晚餐：燒肉力丸 なんば 難波湊町店</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGE 9: Day 5 -->
-        <section id="tab-day5" class="tab-content hidden print-page space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center border-b pb-3 mb-4">
-                    <div>
-                        <span class="bg-red-800 text-white text-xs px-2.5 py-1 rounded-full font-bold">DAY 5</span>
-                        <h2 class="text-xl font-bold text-gray-900 inline ml-2">10/21 (三) 動漫巡禮、祈福與返航</h2>
-                    </div>
-                </div>
-
-                <div class="space-y-4 text-sm relative border-l-2 border-red-200 ml-3 pl-4">
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">11:00 前 辦理退房 (Check-out)</div>
-                        <div class="text-xs text-gray-600 mt-0.5">可寄放行李於飯店或車站寄物櫃。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">白天：動漫周邊與神社祈福巡禮</div>
-                        <ul class="text-xs text-gray-600 mt-0.5 list-disc list-inside space-y-1">
-                            <li>日本橋～Fandom namba 動漫店</li>
-                            <li>安利美特 (Animate) 大阪日本橋店</li>
-                            <li>尤尼克斯 Yonex 羽毛球專賣店</li>
-                            <li>難波八坂神社（巨大獅子頭殿，去黴運）</li>
-                            <li>今宮戎神社（祈求財運昌隆）</li>
-                            <li>最後補貨採買 (玉出超市 / LIFE / AEON)</li>
-                        </ul>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-red-700">17:00 離開市區前往關西機場</div>
-                        <div class="text-xs text-gray-600 mt-0.5">預計車程 1 小時，最晚 18:00 前抵達關西機場 T1 報到櫃檯。</div>
-                    </div>
-
-                    <div class="relative">
-                        <div class="absolute -left-[23px] top-1 w-3 h-3 bg-red-800 rounded-full"></div>
-                        <div class="font-bold text-gray-900">21:05 虎航 IT213 起飛返台</div>
-                        <div class="text-xs text-gray-600 mt-0.5">預計 23:00 抵達桃園國際機場 T1，圓滿結束旅程！</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div id="dynamic-sections-container"></div>
 
     </main>
 
     <script>
+        // 切換分頁邏輯
         function switchTab(tabId) {
-            // 隱藏所有分頁
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.add('hidden');
-            });
-            // 顯示選擇的分頁
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             const targetTab = document.getElementById('tab-' + tabId);
-            if (targetTab) {
-                targetTab.classList.remove('hidden');
-            }
+            if (targetTab) targetTab.classList.remove('hidden');
 
-            // 重置所有頁籤的樣式
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
             });
-
-            // 設定當前選中頁籤的樣式 (深紅底白字 + 粗體)
             const activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) {
                 activeBtn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm';
             }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 列印與 PDF 匯出觸發事件
-        document.addEventListener('DOMContentLoaded', function() {
+        // CSV 解析函數 (精準處理逗號與換行)
+        function parseCSV(str) {
+            const arr = [];
+            let quote = false;
+            let row = 0, col = 0;
+            arr[row] = [];
+            arr[row][col] = '';
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; arr[row][col] = ''; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; arr[row] = []; arr[row][col] = ''; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; arr[row] = []; arr[row][col] = ''; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; arr[row] = []; arr[row][col] = ''; continue; }
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
+
+        // 讀取並渲染 Google 試算表資料
+        async function loadGoogleSheet() {
+            // 這就是您剛剛授權發布的試算表 CSV 連結
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQZhCES9RZqQptYj1raYD1iyPVPKH78FtuYtu9sbI0VhzrkH-52ebzp5Qiekf3MhCB1Z2lDf2LJbD12/pub?gid=283976823&single=true&output=csv";
+
+            try {
+                const response = await fetch(sheetUrl + "&t=" + new Date().getTime()); // 加時間戳避免快取
+                const csvText = await response.text();
+                const data = parseCSV(csvText);
+
+                // 過濾有效資料行 (跳過第一行標題，且第一欄 Day 必須有值)
+                const schedule = data.slice(1).filter(row => row.length >= 3 && row[0].trim() !== '');
+
+                // 將資料依照 Day 分群 (Day 1, Day 2...)
+                const daysMap = new Map();
+                schedule.forEach(row => {
+                    const day = row[0].trim();
+                    if (!daysMap.has(day)) daysMap.set(day, []);
+                    daysMap.get(day).push({
+                        time: row[1] ? row[1].trim() : '',
+                        title: row[2] ? row[2].trim() : '',
+                        detail: row[3] ? row[3].trim() : '',
+                        category: row[4] ? row[4].trim() : ''
+                    });
+                });
+
+                const navContainer = document.getElementById('main-nav');
+                const sectionsContainer = document.getElementById('dynamic-sections-container');
+
+                // 移除讀取中提示
+                const loader = document.getElementById('loading-indicator');
+                if (loader) loader.remove();
+
+                // 開始依照天數動態生成按鈕與內容
+                let dayIndex = 1;
+                daysMap.forEach((items, dayName) => {
+                    const tabId = 'day' + dayIndex;
+
+                    // 1. 生成上方導覽按鈕
+                    const btn = document.createElement('button');
+                    btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
+                    btn.id = 'btn-' + tabId;
+                    btn.innerText = dayName;
+                    btn.onclick = () => switchTab(tabId);
+                    navContainer.appendChild(btn);
+
+                    // 2. 生成對應天數的行程 HTML
+                    const section = document.createElement('section');
+                    section.id = 'tab-' + tabId;
+                    section.className = 'tab-content hidden print-page space-y-4';
+
+                    let timelineHtml = items.map(item => {
+                        return `
+                        <div class="relative">
+                            <div class="absolute -left-[23px] top-1.5 w-3 h-3 bg-red-800 rounded-full border-2 border-white shadow-sm"></div>
+                            <div class="font-bold text-gray-900">
+                                ${item.time ? `<span class="text-red-800 mr-1">${item.time}</span> ` : ''} 
+                                ${item.title}
+                            </div>
+                            ${item.detail ? `<div class="text-xs text-gray-600 mt-0.5 leading-relaxed">${item.detail}</div>` : ''}
+                        </div>
+                        `;
+                    }).join('');
+
+                    section.innerHTML = `
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center border-b pb-3 mb-4">
+                            <h2 class="text-xl font-bold text-gray-900 inline"><i class="fa-regular fa-calendar-check text-red-800 mr-1.5"></i> ${dayName} 專屬行程</h2>
+                        </div>
+                        <div class="space-y-5 text-sm relative border-l-2 border-red-200 ml-3 pl-4 pt-1">
+                            ${timelineHtml}
+                        </div>
+                    </div>
+                    `;
+                    sectionsContainer.appendChild(section);
+                    dayIndex++;
+                });
+
+            } catch (error) {
+                console.error("載入行程失敗:", error);
+                document.getElementById('loading-indicator').innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 無法讀取最新行程';
+            }
+        }
+
+        // 頁面載入後自動觸發抓取 Google 試算表資料
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGoogleSheet();
+            
+            // 列印按鈕綁定
             const printBtn = document.getElementById('printBtn');
             if (printBtn) {
-                printBtn.addEventListener('click', function() {
-                    window.print();
-                });
+                printBtn.addEventListener('click', () => window.print());
             }
         });
     </script>
