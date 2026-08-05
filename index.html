@@ -33,6 +33,7 @@
 </head>
 <body class="text-gray-800 pb-12">
 
+    <!-- 頂部標題與工具列 -->
     <header class="bg-red-800 text-white shadow-md sticky top-0 z-50 no-print">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
@@ -47,25 +48,30 @@
 
     <main class="max-w-4xl mx-auto px-4 pt-4 main-container">
 
+        <!-- 導覽切換選單 -->
         <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200" id="main-nav">
-            <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">行前與住宿</button>
+            <!-- 固定頁籤 -->
+            <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">航班住宿</button>
             <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
-            <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運 vs 隨身</button>
-            <button onclick="switchTab('vjw')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-vjw">VJW 填寫</button>
+            <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運規定</button>
+            <button onclick="switchTab('guide')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-guide">💡新手指南</button>
             
+            <!-- 動態生成的天數頁籤將會插入在這裡 -->
             <div id="loading-indicator" class="flex-1 py-2 px-3.5 text-center text-gray-400 text-xs font-bold flex items-center justify-center gap-2 whitespace-nowrap">
-                <i class="fa-solid fa-spinner fa-spin"></i> 正在同步試算表...
+                <i class="fa-solid fa-spinner fa-spin"></i> 同步試算表中...
             </div>
         </nav>
 
+        <!-- 護照安全警告標語 (固定顯示) -->
         <div class="bg-amber-50 border-l-4 border-amber-500 p-3.5 mb-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start space-x-3">
             <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5 shrink-0"></i>
             <div>
                 <span class="font-bold">重要安全提示：護照必須全程隨身攜帶，切勿離身！</span>
-                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身攜帶護照以備查驗，影本無效。請勿放在飯店或托運行李中。</p>
+                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身攜帶護照以備查驗；辦理免稅也需出示正本（影本無效）。請勿放在飯店或托運行李中。</p>
             </div>
         </div>
 
+        <!-- === 1. 航班與住宿 === -->
         <section id="tab-overview" class="tab-content print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-red-800 mb-3 flex items-center gap-2 border-b pb-2">
@@ -76,7 +82,7 @@
                         <div class="text-xs text-red-600 font-bold mb-1">✈️ 去程航班 (10/17 六)</div>
                         <div class="font-bold text-gray-800 text-base">台灣虎航 IT710</div>
                         <div class="text-gray-700">07:45 桃園機場 T1 ➔ 11:30 關西機場 T1</div>
-                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">🚨 最晚 04:30 前須抵達櫃檯</div>
+                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">🚨 最晚 04:30 前須抵達機場櫃檯</div>
                     </div>
                     <div class="bg-red-50 p-3.5 rounded-xl border border-red-100">
                         <div class="text-xs text-red-600 font-bold mb-1">✈️ 回程航班 (10/21 三)</div>
@@ -95,76 +101,145 @@
             </div>
         </section>
 
+        <!-- === 2. 行李檢查 === -->
         <section id="tab-checklist" class="tab-content hidden print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-clipboard-check text-red-800"></i> 詳細打包與行前檢查表
+                    <i class="fa-solid fa-clipboard-check text-red-800"></i> 出發前打包檢查表
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div class="border p-3.5 rounded-xl">
+                    <div class="border p-3.5 rounded-xl bg-gray-50">
                         <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件與財物</h3>
-                        <div class="space-y-1.5 text-gray-700">
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span class="font-bold text-red-700">護照正本（效期需在 6 個月以上）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>海外刷卡信用卡（建議準備 2 張）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>ICOCA 或 Suica 交通卡</span></label>
+                        <div class="space-y-2 text-gray-700">
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span><strong class="text-red-700">護照正本</strong>（效期需 6 個月以上）</span></label>
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>海外刷卡信用卡（建議準備 2 張備用）</span></label>
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>ICOCA 或綁定 Apple Pay Suica</span></label>
                         </div>
                     </div>
-                    <div class="border p-3.5 rounded-xl">
+                    <div class="border p-3.5 rounded-xl bg-gray-50">
                         <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">🔌 3C 電子產品</h3>
-                        <div class="space-y-1.5 text-gray-700">
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>手機、網卡與充電線</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span class="font-bold">行動電源（容量符合規定，隨身攜帶）</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-red-800"> <span>多孔充電頭 / 延長線</span></label>
+                        <div class="space-y-2 text-gray-700">
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>手機、日本上網卡與充電線</span></label>
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span><strong>行動電源</strong>（隨身攜帶，不可托運）</span></label>
+                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>多孔充電頭 / 延長線</span></label>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- === 3. 托運 vs 隨身 === -->
         <section id="tab-baggage" class="tab-content hidden print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-plane-luggage text-red-800"></i> 行李打包分流指南
+                    <i class="fa-solid fa-plane-luggage text-red-800"></i> 行李打包指南：托運 vs 隨身
                 </h2>
+                <p class="text-sm text-gray-600 mb-4">過安檢被翻行李很麻煩，請大家務必把這幾個大魔王分類好：</p>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div class="bg-red-50 border border-red-200 p-4 rounded-xl space-y-2">
-                        <div class="font-bold text-red-800 text-base flex items-center gap-1.5"><i class="fa-solid fa-person-walking-luggage"></i> 必須【隨身攜帶】</div>
-                        <ul class="list-disc list-inside space-y-1 text-gray-700 text-xs">
-                            <li><strong class="text-red-800">行動電源 / 鋰電池</strong> (絕對禁止托運)</li>
-                            <li><strong class="text-red-800">重要證件與財物現金</strong></li>
-                            <li>打火機 (每人限 1 個普通打火機)</li>
+                    <div class="bg-red-50 border border-red-200 p-4 rounded-xl space-y-3">
+                        <div class="font-bold text-red-800 text-base flex items-center gap-1.5"><i class="fa-solid fa-person-walking-luggage"></i> 必須【隨身帶上飛機】</div>
+                        <p class="text-xs text-red-700 font-semibold bg-white p-1 rounded inline-block">❌ 放托運行李會被退回開箱</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
+                            <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>⚠️ <span class="underline">2026 最新規定，每人最多帶 2 顆。</span> 嚴禁在飛機上幫手機充電，且不可放上方行李櫃，必須放隨身包包。</li>
+                            <li><strong class="text-red-800">護照與貴重物品：</strong>現金、信用卡。</li>
+                            <li><strong class="text-gray-900">打火機：</strong>每人限帶 1 個「普通」打火機 (防風的藍焰打火機禁止攜帶)。</li>
                         </ul>
                     </div>
-                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl space-y-2">
-                        <div class="font-bold text-blue-900 text-base flex items-center gap-1.5"><i class="fa-solid fa-suitcase"></i> 必須【托運】</div>
-                        <ul class="list-disc list-inside space-y-1 text-gray-700 text-xs">
-                            <li><strong class="text-blue-900">大於 100ml 的液體/膏狀物/果凍</strong></li>
-                            <li><strong class="text-blue-900">剪刀、指甲剪、水果刀等尖銳物</strong></li>
-                            <li>長度超過 60 公分之腳架或長傘</li>
+                    
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl space-y-3">
+                        <div class="font-bold text-blue-900 text-base flex items-center gap-1.5"><i class="fa-solid fa-suitcase"></i> 必須【放托運行李箱】</div>
+                        <p class="text-xs text-blue-800 font-semibold bg-white p-1 rounded inline-block">❌ 隨身攜帶過安檢會被直接沒收</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
+                            <li><strong class="text-blue-900">超過 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭</strong>，只要單罐大於100ml就必須托運！</li>
+                            <li><strong class="text-blue-900">刀具與尖銳物：</strong>剪刀、指甲剪、修眉刀。</li>
+                            <li><strong class="text-blue-900">長傘與腳架：</strong>長度超過 60 公分的自拍桿或傘。</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="tab-vjw" class="tab-content hidden print-page space-y-4">
+        <!-- === 4. 新手指南 (VJW, 交通, 退稅) === -->
+        <section id="tab-guide" class="tab-content hidden print-page space-y-4">
+            
+            <!-- VJW 通關 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-qrcode text-red-800"></i> Visit Japan Web (VJW) 住宿資料
+                    <i class="fa-solid fa-passport text-blue-600"></i> 一、VJW 填寫與電子通關
                 </h2>
-                <div class="border rounded-xl p-4 bg-gray-50 space-y-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div><span class="text-gray-500 block">都道府縣：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Osaka (大阪府)</span></div>
-                        <div><span class="text-gray-500 block">市区町村：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Naniwa-ku, Osaka-shi</span></div>
-                        <div class="sm:col-span-2"><span class="text-gray-500 block">町名札地 (Address)：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">5-6-19 Nipponbashi</span></div>
-                        <div class="sm:col-span-2"><span class="text-gray-500 block">飯店名稱 (Hotel Name)：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">Hotel Arashi Nippombashi 2 No.008</span></div>
-                        <div class="sm:col-span-2"><span class="text-gray-500 block">日本聯絡電話：</span><span class="font-mono bg-white px-2 py-1 rounded border block mt-0.5 font-bold">+81 6-6631-0008</span></div>
+                <div class="space-y-3 text-gray-700">
+                    <p>日本採電子化通關，建議出發前 <strong>3~5天</strong> 上網填寫完成，到機場就能快速通關！</p>
+                    <ul class="list-disc list-inside space-y-1 ml-1">
+                        <li><strong>填寫準備：</strong>護照、航班號 (IT710) 以及下方飯店資訊。</li>
+                        <li><strong>截圖備用：</strong>填完會拿到專屬 <strong>QR Code</strong>，務必截圖存手機 (避免機場沒網路)。</li>
+                        <li><strong>通關流程：</strong>下機 ➔ 刷QR/指紋 ➔ 拿行李 ➔ 刷海關QR ➔ 順利入境！</li>
+                    </ul>
+                    
+                    <div class="border rounded-xl p-3 bg-gray-50 text-xs mt-3">
+                        <div class="font-bold text-gray-900 mb-1 border-b pb-1">📍 VJW 必填：第一晚住宿資料</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
+                            <div><span class="text-gray-500">都道府縣：</span><br><span class="font-bold text-sm">Osaka (大阪府)</span></div>
+                            <div><span class="text-gray-500">市区町村：</span><br><span class="font-bold text-sm">Naniwa-ku, Osaka-shi</span></div>
+                            <div class="sm:col-span-2"><span class="text-gray-500">町名札地 (Address)：</span><br><span class="font-bold text-sm">5-6-19 Nipponbashi</span></div>
+                            <div class="sm:col-span-2"><span class="text-gray-500">飯店名稱：</span><br><span class="font-bold text-sm">Hotel Arashi Nippombashi 2 No.008</span></div>
+                            <div class="sm:col-span-2"><span class="text-gray-500">聯絡電話：</span><br><span class="font-bold text-sm">+81 6-6631-0008</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- 電車交通 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
+                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-train-subway text-green-600"></i> 二、大阪交通怎麼搭？
+                </h2>
+                <div class="space-y-4 text-gray-700">
+                    <p>不用怕迷路，我們的行程已經規劃好最省錢的兩種搭法：</p>
+                    
+                    <div class="bg-green-50 p-3.5 rounded-xl border border-green-200">
+                        <div class="font-bold text-green-800 mb-1">💳 Day 1 & Day 2：使用 Suica 或 ICOCA (隨搭隨扣)</div>
+                        <ul class="list-disc list-inside text-xs space-y-1">
+                            <li>前兩天行程彈性，像台灣悠遊卡一樣進出站逼一下就好。</li>
+                            <li><strong>iPhone 推薦：</strong>打開「錢包(Apple Pay)」，點「+」加入交通卡搜尋「Suica」，手機直接刷卡進站，還能隨時用信用卡加值！</li>
+                            <li>安卓或無綁卡用戶：在車站機器買實體 ICOCA 卡儲值即可。</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-orange-50 p-3.5 rounded-xl border border-orange-200">
+                        <div class="font-bold text-orange-800 mb-1">🎟️ Day 3、4、5：使用「大阪周遊卡」</div>
+                        <ul class="list-disc list-inside text-xs space-y-1">
+                            <li><strong>交通無限搭：</strong>這三天搭乘大阪市營地下鐵全部免費。</li>
+                            <li><strong>景點免費玩：</strong>行程裡的<strong class="text-orange-700">大阪城、梅田空中庭園(15:00前)、通天閣、天保山摩天輪</strong>，只要刷這張卡就能直接進去，連門票都不用買，超級划算！</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 退稅規定 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
+                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-yen-sign text-amber-600"></i> 三、免稅退稅怎麼算？
+                </h2>
+                <div class="space-y-3 text-gray-700">
+                    <p>我們 10 月去剛好適用最方便的<strong>退稅舊制</strong>（日本預計 2026 年 11 月改版）：</p>
+                    <ul class="list-disc list-inside space-y-2 ml-1 text-sm">
+                        <li><strong>免稅門檻：</strong>同一天在同一家有貼「Tax-Free」的商店，買滿 <strong>5000 日圓</strong> (不含稅) 就能免稅。</li>
+                        <li><strong>結帳方式：</strong>結帳時直接給店員看<strong>「護照正本」</strong>，就能直接付免稅後的便宜價格。</li>
+                    </ul>
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-200 mt-2 text-xs">
+                        <strong class="text-red-700">⚠️ 藥妝零食大禁忌 (消耗品)：</strong><br>
+                        買免稅的藥妝、保養品、零食，店員會用透明袋封起來。<strong class="text-gray-900">在日本期間絕對不可以拆開！</strong>若被海關查到拆封，會被要求補繳 10% 稅金。請原封不動塞進托運行李帶回台灣。
+                    </div>
+                </div>
+            </div>
+
         </section>
 
+        <!-- ========================================== -->
+        <!-- 下方區塊將由 JavaScript 自動抓取 Google 試算表生成 -->
+        <!-- ========================================== -->
         <div id="dynamic-sections-container"></div>
 
     </main>
