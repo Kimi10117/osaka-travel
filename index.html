@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
 
-        /* 列印專用 CSS 優化 */
+        /* 列印專用 CSS 優化：隱藏不必要的按鈕 */
         @media print {
             .no-print { display: none !important; }
             body { background-color: #ffffff !important; color: #000000 !important; padding: 0 !important; margin: 0 !important; }
@@ -26,19 +26,22 @@
             }
         }
         
-        /* 隱藏捲軸但可滑動 */
+        /* 隱藏導覽列捲軸但保持可滑動 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 返回頂部按鈕動畫 */
+        #backToTop { transition: opacity 0.3s; }
     </style>
 </head>
-<body class="text-gray-800 pb-12">
+<body class="text-gray-800 pb-12 relative">
 
     <!-- 頂部標題與工具列 -->
     <header class="bg-red-800 text-white shadow-md sticky top-0 z-50 no-print">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-cloud-arrow-down text-xl"></i>
-                <h1 class="font-bold text-lg tracking-wide">大阪自由行 <span class="text-xs bg-red-600 px-1.5 py-0.5 rounded ml-1">即時同步版</span></h1>
+                <h1 class="font-bold text-lg tracking-wide">大阪自由行 <span class="text-xs bg-red-600 px-1.5 py-0.5 rounded ml-1 shadow-sm">即時同步版</span></h1>
             </div>
             <button id="printBtn" type="button" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-3.5 py-2 rounded-lg border border-red-500 flex items-center gap-1.5 transition shadow-sm active:scale-95">
                 <i class="fa-solid fa-print"></i> 儲存 PDF
@@ -49,7 +52,7 @@
     <main class="max-w-4xl mx-auto px-4 pt-4 main-container">
 
         <!-- 導覽切換選單 -->
-        <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200" id="main-nav">
+        <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200 sticky top-[60px] z-40" id="main-nav">
             <!-- 固定頁籤 -->
             <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">航班住宿</button>
             <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
@@ -58,21 +61,40 @@
             
             <!-- 動態生成的天數頁籤將會插入在這裡 -->
             <div id="loading-indicator" class="flex-1 py-2 px-3.5 text-center text-gray-400 text-xs font-bold flex items-center justify-center gap-2 whitespace-nowrap">
-                <i class="fa-solid fa-spinner fa-spin"></i> 同步試算表中...
+                <i class="fa-solid fa-spinner fa-spin"></i> 載入行程中...
             </div>
         </nav>
 
-        <!-- 護照安全警告標語 (固定顯示) -->
+        <!-- 護照安全警告標語 -->
         <div class="bg-amber-50 border-l-4 border-amber-500 p-3.5 mb-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start space-x-3">
             <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5 shrink-0"></i>
             <div>
                 <span class="font-bold">重要安全提示：護照必須全程隨身攜帶，切勿離身！</span>
-                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身攜帶護照以備查驗；辦理免稅也需出示正本（影本無效）。請勿放在飯店或托運行李中。</p>
+                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身帶護照備查；免稅也需出示正本（影本無效）。請勿放飯店或托運。</p>
             </div>
         </div>
 
         <!-- === 1. 航班與住宿 === -->
         <section id="tab-overview" class="tab-content print-page space-y-4">
+            <!-- 實用旅遊小知識面板 -->
+            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex justify-between items-center text-center shadow-sm">
+                <div class="flex-1 border-r border-blue-200">
+                    <i class="fa-solid fa-temperature-half text-blue-500 mb-1.5 text-xl block"></i>
+                    <div class="text-xs text-blue-900 font-bold">10月均溫</div>
+                    <div class="text-sm font-bold text-gray-800">15~23°C</div>
+                </div>
+                <div class="flex-1 border-r border-blue-200">
+                    <i class="fa-solid fa-yen-sign text-blue-500 mb-1.5 text-xl block"></i>
+                    <div class="text-xs text-blue-900 font-bold">預估匯率</div>
+                    <div class="text-sm font-bold text-gray-800">約 0.22</div>
+                </div>
+                <div class="flex-1">
+                    <i class="fa-solid fa-plug text-blue-500 mb-1.5 text-xl block"></i>
+                    <div class="text-xs text-blue-900 font-bold">電壓插座</div>
+                    <div class="text-sm font-bold text-gray-800">同台灣 100V</div>
+                </div>
+            </div>
+
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
                 <h2 class="text-lg font-bold text-red-800 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-plane"></i> 航班與住宿資訊
@@ -82,21 +104,26 @@
                         <div class="text-xs text-red-600 font-bold mb-1">✈️ 去程航班 (10/17 六)</div>
                         <div class="font-bold text-gray-800 text-base">台灣虎航 IT710</div>
                         <div class="text-gray-700">07:45 桃園機場 T1 ➔ 11:30 關西機場 T1</div>
-                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">🚨 最晚 04:30 前須抵達機場櫃檯</div>
+                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block shadow-sm">🚨 最晚 04:30 前須抵達機場櫃檯</div>
                     </div>
                     <div class="bg-red-50 p-3.5 rounded-xl border border-red-100">
                         <div class="text-xs text-red-600 font-bold mb-1">✈️ 回程航班 (10/21 三)</div>
                         <div class="font-bold text-gray-800 text-base">台灣虎航 IT213</div>
                         <div class="text-gray-700">21:05 關西機場 T1 ➔ 23:00 桃園機場 T1</div>
-                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block">🚨 17:00 離開市區，18:00 前抵達機場</div>
+                        <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block shadow-sm">🚨 17:00 離開市區，18:00 前抵達機場</div>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1">
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1 relative">
                     <div class="text-xs text-gray-500 font-bold">🏨 住宿資訊（連續入住 4 晚）</div>
-                    <div class="font-bold text-gray-900 text-base">嵐 Hotel Arashi 日本橋 2 號店 (No.008)</div>
-                    <div class="text-gray-700"><span class="font-medium">地址：</span>大阪府大阪市浪速区日本橋5-6-19 (556-0005)</div>
-                    <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A 或 2 號出口即達</div>
-                    <div class="text-gray-500 text-xs pt-1">入住：16:00 Check-in / 退房：11:00 Check-out</div>
+                    <div class="font-bold text-gray-900 text-base">嵐 Hotel Arashi 日本橋 2 號店</div>
+                    <div class="text-gray-700"><span class="font-medium">地址：</span>大阪市浪速区日本橋5-6-19</div>
+                    <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A/2 號出口</div>
+                    <div class="text-gray-500 text-xs pt-1">入住：16:00 / 退房：11:00</div>
+                    
+                    <!-- 飯店導航按鈕 -->
+                    <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Arashi+Nippombashi+2+No.008+大阪" target="_blank" class="absolute right-4 bottom-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold border border-blue-300 rounded-lg text-xs transition-colors shadow-sm no-print">
+                        <i class="fa-solid fa-location-dot"></i> 飯店導航
+                    </a>
                 </div>
             </div>
         </section>
@@ -142,9 +169,9 @@
                         <div class="font-bold text-red-800 text-base flex items-center gap-1.5"><i class="fa-solid fa-person-walking-luggage"></i> 必須【隨身帶上飛機】</div>
                         <p class="text-xs text-red-700 font-semibold bg-white p-1 rounded inline-block">❌ 放托運行李會被退回開箱</p>
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
-                            <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>⚠️ <span class="underline">2026 最新規定，每人最多帶 2 顆。</span> 嚴禁在飛機上幫手機充電，且不可放上方行李櫃，必須放隨身包包。</li>
+                            <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>⚠️ <span class="underline">每人最多 2 顆。</span> 嚴禁在飛機上幫手機充電，且不可放上方行李櫃，必須放隨身包包。</li>
                             <li><strong class="text-red-800">護照與貴重物品：</strong>現金、信用卡。</li>
-                            <li><strong class="text-gray-900">打火機：</strong>每人限帶 1 個「普通」打火機 (防風的藍焰打火機禁止攜帶)。</li>
+                            <li><strong class="text-gray-900">打火機：</strong>每人限帶 1 個「普通」打火機。</li>
                         </ul>
                     </div>
                     
@@ -154,7 +181,7 @@
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
                             <li><strong class="text-blue-900">超過 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭</strong>，只要單罐大於100ml就必須托運！</li>
                             <li><strong class="text-blue-900">刀具與尖銳物：</strong>剪刀、指甲剪、修眉刀。</li>
-                            <li><strong class="text-blue-900">長傘與腳架：</strong>長度超過 60 公分的自拍桿或傘。</li>
+                            <li><strong class="text-blue-900">長傘與腳架：</strong>長度超過 60 公分的腳架。</li>
                         </ul>
                     </div>
                 </div>
@@ -163,20 +190,13 @@
 
         <!-- === 4. 新手指南 (VJW, 交通, 退稅) === -->
         <section id="tab-guide" class="tab-content hidden print-page space-y-4">
-            
             <!-- VJW 通關 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-passport text-blue-600"></i> 一、VJW 填寫與電子通關
                 </h2>
                 <div class="space-y-3 text-gray-700">
-                    <p>日本採電子化通關，建議出發前 <strong>3~5天</strong> 上網填寫完成，到機場就能快速通關！</p>
-                    <ul class="list-disc list-inside space-y-1 ml-1">
-                        <li><strong>填寫準備：</strong>護照、航班號 (IT710) 以及下方飯店資訊。</li>
-                        <li><strong>截圖備用：</strong>填完會拿到專屬 <strong>QR Code</strong>，務必截圖存手機 (避免機場沒網路)。</li>
-                        <li><strong>通關流程：</strong>下機 ➔ 刷QR/指紋 ➔ 拿行李 ➔ 刷海關QR ➔ 順利入境！</li>
-                    </ul>
-                    
+                    <p>日本採電子化通關，建議出發前 <strong>3~5天</strong> 填寫，到機場就能快速通關！截圖存好 <strong>QR Code</strong> 以防沒網路。</p>
                     <div class="border rounded-xl p-3 bg-gray-50 text-xs mt-3">
                         <div class="font-bold text-gray-900 mb-1 border-b pb-1">📍 VJW 必填：第一晚住宿資料</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
@@ -196,22 +216,17 @@
                     <i class="fa-solid fa-train-subway text-green-600"></i> 二、大阪交通怎麼搭？
                 </h2>
                 <div class="space-y-4 text-gray-700">
-                    <p>不用怕迷路，我們的行程已經規劃好最省錢的兩種搭法：</p>
-                    
                     <div class="bg-green-50 p-3.5 rounded-xl border border-green-200">
-                        <div class="font-bold text-green-800 mb-1">💳 Day 1 & Day 2：使用 Suica 或 ICOCA (隨搭隨扣)</div>
+                        <div class="font-bold text-green-800 mb-1">💳 Day 1 & Day 2：使用 Suica 或 ICOCA</div>
                         <ul class="list-disc list-inside text-xs space-y-1">
-                            <li>前兩天行程彈性，像台灣悠遊卡一樣進出站逼一下就好。</li>
-                            <li><strong>iPhone 推薦：</strong>打開「錢包(Apple Pay)」，點「+」加入交通卡搜尋「Suica」，手機直接刷卡進站，還能隨時用信用卡加值！</li>
-                            <li>安卓或無綁卡用戶：在車站機器買實體 ICOCA 卡儲值即可。</li>
+                            <li>前兩天隨搭隨扣。iPhone 用戶可在「錢包(Apple Pay)」加入 Suica 直接刷手機進站。</li>
                         </ul>
                     </div>
-
                     <div class="bg-orange-50 p-3.5 rounded-xl border border-orange-200">
                         <div class="font-bold text-orange-800 mb-1">🎟️ Day 3、4、5：使用「大阪周遊卡」</div>
                         <ul class="list-disc list-inside text-xs space-y-1">
-                            <li><strong>交通無限搭：</strong>這三天搭乘大阪市營地下鐵全部免費。</li>
-                            <li><strong>景點免費玩：</strong>行程裡的<strong class="text-orange-700">大阪城、梅田空中庭園(15:00前)、通天閣、天保山摩天輪</strong>，只要刷這張卡就能直接進去，連門票都不用買，超級划算！</li>
+                            <li>這三天搭乘大阪市營地下鐵全部免費。</li>
+                            <li>行程裡的<strong class="text-orange-700">大阪城、梅田空中庭園(15:00前)、通天閣、摩天輪</strong>，刷這張卡直接進去，連門票都不用買！</li>
                         </ul>
                     </div>
                 </div>
@@ -223,18 +238,16 @@
                     <i class="fa-solid fa-yen-sign text-amber-600"></i> 三、免稅退稅怎麼算？
                 </h2>
                 <div class="space-y-3 text-gray-700">
-                    <p>我們 10 月去剛好適用最方便的<strong>退稅舊制</strong>（日本預計 2026 年 11 月改版）：</p>
                     <ul class="list-disc list-inside space-y-2 ml-1 text-sm">
-                        <li><strong>免稅門檻：</strong>同一天在同一家有貼「Tax-Free」的商店，買滿 <strong>5000 日圓</strong> (不含稅) 就能免稅。</li>
-                        <li><strong>結帳方式：</strong>結帳時直接給店員看<strong>「護照正本」</strong>，就能直接付免稅後的便宜價格。</li>
+                        <li><strong>免稅門檻：</strong>同一家貼有「Tax-Free」的店買滿 <strong>5000 日圓</strong> (不含稅)。</li>
+                        <li><strong>結帳方式：</strong>出示<strong>「護照正本」</strong>，直接付免稅後的價格。</li>
                     </ul>
                     <div class="bg-red-50 p-3 rounded-lg border border-red-200 mt-2 text-xs">
                         <strong class="text-red-700">⚠️ 藥妝零食大禁忌 (消耗品)：</strong><br>
-                        買免稅的藥妝、保養品、零食，店員會用透明袋封起來。<strong class="text-gray-900">在日本期間絕對不可以拆開！</strong>若被海關查到拆封，會被要求補繳 10% 稅金。請原封不動塞進托運行李帶回台灣。
+                        免稅藥妝與零食會用透明袋封起來。<strong class="text-gray-900">在日本期間絕對不可以拆開！</strong>若查到拆封會被要求補繳 10% 稅金。
                     </div>
                 </div>
             </div>
-
         </section>
 
         <!-- ========================================== -->
@@ -243,6 +256,11 @@
         <div id="dynamic-sections-container"></div>
 
     </main>
+
+    <!-- 浮動返回頂部按鈕 -->
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-70 hover:bg-red-800 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-50 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
 
     <script>
         // 切換分頁邏輯
@@ -261,7 +279,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // CSV 解析函數 (精準處理逗號與換行)
+        // CSV 解析函數
         function parseCSV(str) {
             const arr = [];
             let quote = false;
@@ -283,18 +301,18 @@
 
         // 讀取並渲染 Google 試算表資料
         async function loadGoogleSheet() {
-            // 這就是您剛剛授權發布的試算表 CSV 連結
+            // 您授權發布的試算表 CSV 連結
             const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQZhCES9RZqQptYj1raYD1iyPVPKH78FtuYtu9sbI0VhzrkH-52ebzp5Qiekf3MhCB1Z2lDf2LJbD12/pub?gid=283976823&single=true&output=csv";
 
             try {
-                const response = await fetch(sheetUrl + "&t=" + new Date().getTime()); // 加時間戳避免快取
+                const response = await fetch(sheetUrl + "&t=" + new Date().getTime()); 
                 const csvText = await response.text();
                 const data = parseCSV(csvText);
 
-                // 過濾有效資料行 (跳過第一行標題，且第一欄 Day 必須有值)
+                // 過濾有效資料行
                 const schedule = data.slice(1).filter(row => row.length >= 3 && row[0].trim() !== '');
 
-                // 將資料依照 Day 分群 (Day 1, Day 2...)
+                // 依 Day 分群
                 const daysMap = new Map();
                 schedule.forEach(row => {
                     const day = row[0].trim();
@@ -309,12 +327,10 @@
 
                 const navContainer = document.getElementById('main-nav');
                 const sectionsContainer = document.getElementById('dynamic-sections-container');
-
-                // 移除讀取中提示
                 const loader = document.getElementById('loading-indicator');
                 if (loader) loader.remove();
 
-                // 開始依照天數動態生成按鈕與內容
+                // 生成天數按鈕與內容
                 let dayIndex = 1;
                 daysMap.forEach((items, dayName) => {
                     const tabId = 'day' + dayIndex;
@@ -333,24 +349,48 @@
                     section.className = 'tab-content hidden print-page space-y-4';
 
                     let timelineHtml = items.map(item => {
+                        // 處理分類標籤顏色
+                        let badgeHtml = '';
+                        if (item.category) {
+                            let badgeColor = 'bg-gray-100 text-gray-600 border-gray-200'; // 預設
+                            if (item.category.includes('美食') || item.category.includes('餐廳')) badgeColor = 'bg-orange-100 text-orange-700 border-orange-200';
+                            else if (item.category.includes('景點')) badgeColor = 'bg-blue-100 text-blue-700 border-blue-200';
+                            else if (item.category.includes('交通') || item.category.includes('機場')) badgeColor = 'bg-green-100 text-green-700 border-green-200';
+                            else if (item.category.includes('購物')) badgeColor = 'bg-pink-100 text-pink-700 border-pink-200';
+                            else if (item.category.includes('住宿')) badgeColor = 'bg-purple-100 text-purple-700 border-purple-200';
+                            
+                            badgeHtml = `<span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${item.category}</span>`;
+                        }
+
+                        // 生成 Google Maps 導航連結 (自動編碼行程標題與大阪作為關鍵字)
+                        // 若標題含有「機場」，則不加上大阪字眼避免導航錯誤
+                        let searchKeyword = item.title.includes('機場') ? item.title : item.title + ' 大阪';
+                        let mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchKeyword)}`;
+
                         return `
-                        <div class="relative">
-                            <div class="absolute -left-[23px] top-1.5 w-3 h-3 bg-red-800 rounded-full border-2 border-white shadow-sm"></div>
-                            <div class="font-bold text-gray-900">
-                                ${item.time ? `<span class="text-red-800 mr-1">${item.time}</span> ` : ''} 
-                                ${item.title}
+                        <div class="relative bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm ml-1">
+                            <div class="absolute -left-[28px] top-1/2 -translate-y-1/2 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
+                            <div class="font-bold text-gray-900 flex flex-wrap items-center gap-y-2">
+                                ${item.time ? `<span class="text-red-800 mr-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-sm tracking-wide shadow-sm">${item.time}</span> ` : ''} 
+                                <span class="text-[15px]">${item.title}</span>
+                                ${badgeHtml}
+                                
+                                <!-- 智慧導航按鈕 -->
+                                <a href="${mapLink}" target="_blank" class="ml-auto flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-xs transition-colors shadow-sm no-print active:scale-95">
+                                    <i class="fa-solid fa-location-dot text-blue-500"></i>導航
+                                </a>
                             </div>
-                            ${item.detail ? `<div class="text-xs text-gray-600 mt-0.5 leading-relaxed">${item.detail}</div>` : ''}
+                            ${item.detail ? `<div class="text-xs text-gray-600 mt-2.5 leading-relaxed bg-white p-2 rounded border border-gray-100">${item.detail}</div>` : ''}
                         </div>
                         `;
                     }).join('');
 
                     section.innerHTML = `
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                        <div class="flex justify-between items-center border-b pb-3 mb-4">
-                            <h2 class="text-xl font-bold text-gray-900 inline"><i class="fa-regular fa-calendar-check text-red-800 mr-1.5"></i> ${dayName} 專屬行程</h2>
+                        <div class="flex justify-between items-center border-b pb-3 mb-5">
+                            <h2 class="text-xl font-bold text-gray-900 inline"><i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName} 專屬行程</h2>
                         </div>
-                        <div class="space-y-5 text-sm relative border-l-2 border-red-200 ml-3 pl-4 pt-1">
+                        <div class="space-y-4 text-sm relative border-l-[3px] border-red-100 ml-2 pl-3">
                             ${timelineHtml}
                         </div>
                     </div>
@@ -361,19 +401,27 @@
 
             } catch (error) {
                 console.error("載入行程失敗:", error);
-                document.getElementById('loading-indicator').innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 無法讀取最新行程';
+                document.getElementById('loading-indicator').innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 無法讀取最新行程，請檢查網路';
             }
         }
 
-        // 頁面載入後自動觸發抓取 Google 試算表資料
+        // 監聽滾動事件顯示「返回頂部」按鈕
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                btn.classList.remove('opacity-0', 'pointer-events-none');
+                btn.classList.add('opacity-100', 'pointer-events-auto');
+            } else {
+                btn.classList.add('opacity-0', 'pointer-events-none');
+                btn.classList.remove('opacity-100', 'pointer-events-auto');
+            }
+        });
+
+        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             loadGoogleSheet();
-            
-            // 列印按鈕綁定
             const printBtn = document.getElementById('printBtn');
-            if (printBtn) {
-                printBtn.addEventListener('click', () => window.print());
-            }
+            if (printBtn) printBtn.addEventListener('click', () => window.print());
         });
     </script>
 </body>
