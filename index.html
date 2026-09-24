@@ -29,14 +29,6 @@
         /* 隱藏捲軸但保持可滑動 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* 頁籤選中樣式 */
-        .tab-btn.active-tab {
-            background-color: #991b1b;
-            color: #ffffff;
-            font-weight: 700;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
     </style>
 </head>
 <body class="text-gray-800 pb-12 relative">
@@ -59,7 +51,7 @@
         <!-- 導覽切換選單 -->
         <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200 sticky top-[60px] z-40" id="main-nav">
             <!-- 固定頁籤 -->
-            <button onclick="switchTab('overview')" class="tab-btn active-tab flex-1 py-2 px-3.5 rounded-lg whitespace-nowrap transition text-center" id="btn-overview">航班住宿</button>
+            <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">航班住宿</button>
             <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
             <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運規定</button>
             <button onclick="switchTab('guide')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-guide">💡新手指南</button>
@@ -125,7 +117,7 @@
                     <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A/2 號出口</div>
                     <div class="text-gray-500 text-xs pt-1">入住：16:00 / 退房：11:00</div>
                     
-                    <!-- 飯店導航按鈕 -->
+                    <!-- 飯店專屬導航按鈕 -->
                     <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Arashi+Nippombashi+2+No.008+大阪" target="_blank" class="absolute right-4 bottom-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold border border-blue-300 rounded-lg text-xs transition-colors shadow-sm no-print">
                         <i class="fa-solid fa-location-dot"></i> 飯店導航
                     </a>
@@ -172,7 +164,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div class="bg-red-50 border border-red-200 p-4 rounded-xl space-y-3">
                         <div class="font-bold text-red-800 text-base flex items-center gap-1.5"><i class="fa-solid fa-person-walking-luggage"></i> 必須【隨身帶上飛機】</div>
-                        <p class="text-xs text-red-700 font-semibold bg-white p-1 rounded inline-block">❌ 放托運行李會被退回開箱</p>
+                        <p class="text-xs text-red-700 font-semibold bg-white p-1 rounded inline-block shadow-sm">❌ 放托運行李會被退回開箱</p>
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
                             <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>⚠️ <span class="underline">每人最多 2 顆。</span> 嚴禁在飛機上幫手機充電，且不可放上方行李櫃，必須放隨身包包。</li>
                             <li><strong class="text-red-800">護照與貴重物品：</strong>現金、信用卡。</li>
@@ -182,9 +174,9 @@
                     
                     <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl space-y-3">
                         <div class="font-bold text-blue-900 text-base flex items-center gap-1.5"><i class="fa-solid fa-suitcase"></i> 必須【放托運行李箱】</div>
-                        <p class="text-xs text-blue-800 font-semibold bg-white p-1 rounded inline-block">❌ 隨身攜帶過安檢會被直接沒收</p>
+                        <p class="text-xs text-blue-800 font-semibold bg-white p-1 rounded inline-block shadow-sm">❌ 隨身攜帶過安檢會被直接沒收</p>
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
-                            <li><strong class="text-blue-900">超過 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭</strong>，只要單罐大於100ml就必須托運！</li>
+                            <li><strong class="text-blue-900">大於 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭</strong>，只要單罐大於100ml就必須托運！</li>
                             <li><strong class="text-blue-900">刀具與尖銳物：</strong>剪刀、指甲剪、修眉刀。</li>
                             <li><strong class="text-blue-900">長傘與腳架：</strong>長度超過 60 公分的腳架。</li>
                         </ul>
@@ -263,7 +255,7 @@
     </main>
 
     <!-- 浮動返回頂部按鈕 -->
-    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-70 hover:bg-red-800 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-50 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-70 hover:bg-gray-900 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-50 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
@@ -275,13 +267,11 @@
             if (targetTab) targetTab.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active-tab');
-                btn.classList.add('text-gray-600');
+                btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
             });
             const activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) {
-                activeBtn.classList.add('active-tab');
-                activeBtn.classList.remove('text-gray-600');
+                activeBtn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm';
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -308,7 +298,7 @@
 
         // 讀取並渲染 Google 試算表資料
         async function loadGoogleSheet() {
-            // 您授權發布的試算表 CSV 連結
+            // 您的 CSV 連結
             const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQZhCES9RZqQptYj1raYD1iyPVPKH78FtuYtu9sbI0VhzrkH-52ebzp5Qiekf3MhCB1Z2lDf2LJbD12/pub?gid=283976823&single=true&output=csv";
 
             try {
@@ -316,10 +306,9 @@
                 const csvText = await response.text();
                 const data = parseCSV(csvText);
 
-                // 過濾有效資料行
                 const schedule = data.slice(1).filter(row => row.length >= 3 && row[0].trim() !== '');
 
-                // 依 Day 分群
+                // 依 Day 分群，並新增讀取 F 欄 (row[5]) 的導航地名
                 const daysMap = new Map();
                 schedule.forEach(row => {
                     const day = row[0].trim();
@@ -328,7 +317,8 @@
                         time: row[1] ? row[1].trim() : '',
                         title: row[2] ? row[2].trim() : '',
                         detail: row[3] ? row[3].trim() : '',
-                        category: row[4] ? row[4].trim() : ''
+                        category: row[4] ? row[4].trim() : '',
+                        location: row[5] ? row[5].trim() : '' // 讀取 F 欄位
                     });
                 });
 
@@ -342,7 +332,7 @@
                 daysMap.forEach((items, dayName) => {
                     const tabId = 'day' + dayIndex;
 
-                    // 1. 生成上方導覽按鈕
+                    // 1. 導覽按鈕
                     const btn = document.createElement('button');
                     btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
                     btn.id = 'btn-' + tabId;
@@ -350,7 +340,7 @@
                     btn.onclick = () => switchTab(tabId);
                     navContainer.appendChild(btn);
 
-                    // 2. 生成對應天數的行程 HTML
+                    // 2. 行程區塊 HTML
                     const section = document.createElement('section');
                     section.id = 'tab-' + tabId;
                     section.className = 'tab-content hidden print-page space-y-4';
@@ -359,51 +349,56 @@
                         // 處理分類標籤顏色
                         let badgeHtml = '';
                         if (item.category) {
-                            let badgeColor = 'bg-gray-100 text-gray-600 border-gray-200'; // 預設
-                            if (item.category.includes('美食') || item.category.includes('餐廳')) badgeColor = 'bg-orange-100 text-orange-700 border-orange-200';
-                            else if (item.category.includes('景點')) badgeColor = 'bg-blue-100 text-blue-700 border-blue-200';
-                            else if (item.category.includes('交通') || item.category.includes('機場')) badgeColor = 'bg-green-100 text-green-700 border-green-200';
-                            else if (item.category.includes('購物')) badgeColor = 'bg-pink-100 text-pink-700 border-pink-200';
-                            else if (item.category.includes('住宿')) badgeColor = 'bg-purple-100 text-purple-700 border-purple-200';
+                            let badgeColor = 'bg-gray-100 text-gray-600 border-gray-200';
+                            if (item.category.includes('美食')) badgeColor = 'bg-orange-50 text-orange-700 border-orange-200';
+                            else if (item.category.includes('景點')) badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+                            else if (item.category.includes('交通') || item.category.includes('機場')) badgeColor = 'bg-green-50 text-green-700 border-green-200';
+                            else if (item.category.includes('住宿')) badgeColor = 'bg-purple-50 text-purple-700 border-purple-200';
                             
-                            badgeHtml = `<span class="inline-block mt-1 sm:mt-0 sm:ml-2 px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${item.category}</span>`;
+                            badgeHtml = `<span class="inline-block bg-white px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeColor} align-middle ml-1.5 mb-0.5">${item.category}</span>`;
                         }
 
-                        // 生成 Google Maps 導航連結 (優先使用 Detail 搜尋，若無則用 Title)
-                        // 若標題含有「機場」，則不加上大阪字眼避免導航錯誤
-                        let searchBase = item.detail ? item.detail : item.title;
-                        let searchKeyword = searchBase.includes('機場') ? searchBase : searchBase + ' 大阪';
-                        let mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchKeyword)}`;
+                        // 判斷是否顯示導航按鈕 (只有在 F 欄填寫時才顯示)
+                        let navButtonHtml = '';
+                        if (item.location) {
+                            // 自動在關鍵字後方加上大阪，提高精準度
+                            let mapQuery = encodeURIComponent(item.location + ' 大阪');
+                            navButtonHtml = `
+                            <a href="https://www.google.com/maps/search/?api=1&query=${mapQuery}" target="_blank" class="absolute right-3 top-3 inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-xs transition-colors shadow-sm active:scale-95 no-print z-10">
+                                <i class="fa-solid fa-location-dot"></i> 導航
+                            </a>`;
+                        }
 
+                        // 全新防跑版 RWD 結構
                         return `
-                        <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2">
+                        <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2 mt-4">
+                            <!-- 時間軸紅點 -->
                             <div class="absolute -left-[30px] top-4 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
                             
-                            <!-- 頂部區塊：時間、標題、標籤 與 導航按鈕 -->
-                            <div class="flex justify-between items-start gap-2">
-                                <div class="font-bold text-gray-900 leading-tight pt-0.5">
-                                    ${item.time ? `<span class="text-red-800 mr-1.5 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-sm tracking-wide">${item.time}</span>` : ''} 
+                            <!-- 導航按鈕 (絕對定位於右上角) -->
+                            ${navButtonHtml}
+                            
+                            <!-- 標題與標籤容器 (加上 pr-16 避免文字壓到導航按鈕) -->
+                            <div class="${item.location ? 'pr-16' : 'pr-2'}">
+                                <div class="font-bold text-gray-900 leading-snug">
+                                    ${item.time ? `<span class="inline-block text-red-800 mr-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-sm tracking-wide mb-0.5">${item.time}</span>` : ''} 
                                     <span class="text-[15px] align-middle">${item.title}</span>
                                     ${badgeHtml}
                                 </div>
-                                <!-- 智慧導航按鈕 (固定右上角) -->
-                                <a href="${mapLink}" target="_blank" class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-[11px] transition-colors shadow-sm no-print active:scale-95">
-                                    <i class="fa-solid fa-location-dot"></i> 導航
-                                </a>
                             </div>
 
-                            <!-- 底部區塊：詳細說明 -->
-                            ${item.detail ? `<div class="text-xs text-gray-600 mt-2.5 leading-relaxed bg-gray-50 p-2 rounded border border-gray-100">${item.detail}</div>` : ''}
+                            <!-- 詳細說明 -->
+                            ${item.detail ? `<div class="mt-2.5 text-xs text-gray-600 bg-gray-50 p-2.5 rounded border border-gray-100 leading-relaxed">${item.detail}</div>` : ''}
                         </div>
                         `;
                     }).join('');
 
                     section.innerHTML = `
                     <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">
-                        <div class="flex justify-between items-center border-b border-gray-200 pb-3 mb-5">
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-3 mb-5">
                             <h2 class="text-xl font-bold text-gray-900 inline"><i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName} 專屬行程</h2>
                         </div>
-                        <div class="space-y-4 text-sm relative border-l-[3px] border-red-200 ml-2 pl-3">
+                        <div class="relative border-l-[3px] border-red-200 ml-2 pl-3">
                             ${timelineHtml}
                         </div>
                     </div>
@@ -414,11 +409,11 @@
 
             } catch (error) {
                 console.error("載入行程失敗:", error);
-                document.getElementById('loading-indicator').innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 無法讀取最新行程，請檢查網路';
+                document.getElementById('loading-indicator').innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 網路錯誤，無法讀取最新行程';
             }
         }
 
-        // 監聽滾動事件顯示「返回頂部」按鈕
+        // 監聽滾動事件：顯示「返回頂部」按鈕
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('backToTop');
             if (window.scrollY > 300) {
@@ -430,7 +425,7 @@
             }
         });
 
-        // 初始化
+        // 頁面載入後初始化
         document.addEventListener('DOMContentLoaded', () => {
             loadGoogleSheet();
             const printBtn = document.getElementById('printBtn');
