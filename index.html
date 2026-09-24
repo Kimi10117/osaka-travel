@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
 
-        /* 列印專用 CSS 優化：隱藏不必要的按鈕 */
+        /* 列印專用 CSS 優化 */
         @media print {
             .no-print { display: none !important; }
             body { background-color: #ffffff !important; color: #000000 !important; padding: 0 !important; margin: 0 !important; }
@@ -26,12 +26,17 @@
             }
         }
         
-        /* 隱藏導覽列捲軸但保持可滑動 */
+        /* 隱藏捲軸但保持可滑動 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 返回頂部按鈕動畫 */
-        #backToTop { transition: opacity 0.3s; }
+        /* 頁籤選中樣式 */
+        .tab-btn.active-tab {
+            background-color: #991b1b;
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 <body class="text-gray-800 pb-12 relative">
@@ -54,7 +59,7 @@
         <!-- 導覽切換選單 -->
         <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200 sticky top-[60px] z-40" id="main-nav">
             <!-- 固定頁籤 -->
-            <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">航班住宿</button>
+            <button onclick="switchTab('overview')" class="tab-btn active-tab flex-1 py-2 px-3.5 rounded-lg whitespace-nowrap transition text-center" id="btn-overview">航班住宿</button>
             <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
             <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運規定</button>
             <button onclick="switchTab('guide')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-guide">💡新手指南</button>
@@ -270,11 +275,13 @@
             if (targetTab) targetTab.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-gray-600');
             });
             const activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) {
-                activeBtn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm';
+                activeBtn.classList.add('active-tab');
+                activeBtn.classList.remove('text-gray-600');
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -359,38 +366,44 @@
                             else if (item.category.includes('購物')) badgeColor = 'bg-pink-100 text-pink-700 border-pink-200';
                             else if (item.category.includes('住宿')) badgeColor = 'bg-purple-100 text-purple-700 border-purple-200';
                             
-                            badgeHtml = `<span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${item.category}</span>`;
+                            badgeHtml = `<span class="inline-block mt-1 sm:mt-0 sm:ml-2 px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${item.category}</span>`;
                         }
 
-                        // 生成 Google Maps 導航連結 (自動編碼行程標題與大阪作為關鍵字)
+                        // 生成 Google Maps 導航連結 (優先使用 Detail 搜尋，若無則用 Title)
                         // 若標題含有「機場」，則不加上大阪字眼避免導航錯誤
-                        let searchKeyword = item.title.includes('機場') ? item.title : item.title + ' 大阪';
+                        let searchBase = item.detail ? item.detail : item.title;
+                        let searchKeyword = searchBase.includes('機場') ? searchBase : searchBase + ' 大阪';
                         let mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchKeyword)}`;
 
                         return `
-                        <div class="relative bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm ml-1">
-                            <div class="absolute -left-[28px] top-1/2 -translate-y-1/2 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
-                            <div class="font-bold text-gray-900 flex flex-wrap items-center gap-y-2">
-                                ${item.time ? `<span class="text-red-800 mr-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-sm tracking-wide shadow-sm">${item.time}</span> ` : ''} 
-                                <span class="text-[15px]">${item.title}</span>
-                                ${badgeHtml}
-                                
-                                <!-- 智慧導航按鈕 -->
-                                <a href="${mapLink}" target="_blank" class="ml-auto flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-xs transition-colors shadow-sm no-print active:scale-95">
-                                    <i class="fa-solid fa-location-dot text-blue-500"></i>導航
+                        <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2">
+                            <div class="absolute -left-[30px] top-4 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
+                            
+                            <!-- 頂部區塊：時間、標題、標籤 與 導航按鈕 -->
+                            <div class="flex justify-between items-start gap-2">
+                                <div class="font-bold text-gray-900 leading-tight pt-0.5">
+                                    ${item.time ? `<span class="text-red-800 mr-1.5 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-sm tracking-wide">${item.time}</span>` : ''} 
+                                    <span class="text-[15px] align-middle">${item.title}</span>
+                                    ${badgeHtml}
+                                </div>
+                                <!-- 智慧導航按鈕 (固定右上角) -->
+                                <a href="${mapLink}" target="_blank" class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-[11px] transition-colors shadow-sm no-print active:scale-95">
+                                    <i class="fa-solid fa-location-dot"></i> 導航
                                 </a>
                             </div>
-                            ${item.detail ? `<div class="text-xs text-gray-600 mt-2.5 leading-relaxed bg-white p-2 rounded border border-gray-100">${item.detail}</div>` : ''}
+
+                            <!-- 底部區塊：詳細說明 -->
+                            ${item.detail ? `<div class="text-xs text-gray-600 mt-2.5 leading-relaxed bg-gray-50 p-2 rounded border border-gray-100">${item.detail}</div>` : ''}
                         </div>
                         `;
                     }).join('');
 
                     section.innerHTML = `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                        <div class="flex justify-between items-center border-b pb-3 mb-5">
+                    <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center border-b border-gray-200 pb-3 mb-5">
                             <h2 class="text-xl font-bold text-gray-900 inline"><i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName} 專屬行程</h2>
                         </div>
-                        <div class="space-y-4 text-sm relative border-l-[3px] border-red-100 ml-2 pl-3">
+                        <div class="space-y-4 text-sm relative border-l-[3px] border-red-200 ml-2 pl-3">
                             ${timelineHtml}
                         </div>
                     </div>
