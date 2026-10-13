@@ -37,12 +37,23 @@
     <header class="bg-red-800 text-white shadow-md sticky top-0 z-50 no-print">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-cloud-arrow-down text-xl"></i>
-                <h1 class="font-bold text-lg tracking-wide">大阪自由行 <span class="text-xs bg-red-600 px-1.5 py-0.5 rounded ml-1 shadow-sm">即時同步版</span></h1>
+                <i class="fa-solid fa-torii-gate text-xl"></i>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg tracking-wide flex items-center gap-1.5">
+                        大阪自由行
+                        <span id="sync-badge" class="text-[11px] bg-red-600 px-1.5 py-0.5 rounded shadow-sm font-normal">同步中...</span>
+                    </h1>
+                </div>
             </div>
-            <button id="printBtn" type="button" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-3.5 py-2 rounded-lg border border-red-500 flex items-center gap-1.5 transition shadow-sm active:scale-95">
-                <i class="fa-solid fa-print"></i> 儲存 PDF
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="refreshBtn" type="button" onclick="loadGoogleSheet(true)" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-2.5 py-2 rounded-lg border border-red-500 flex items-center gap-1 transition shadow-sm active:scale-95" title="重新同步試算表">
+                    <i id="refreshIcon" class="fa-solid fa-arrows-rotate"></i>
+                    <span class="hidden sm:inline">重新同步</span>
+                </button>
+                <button id="printBtn" type="button" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-3 py-2 rounded-lg border border-red-500 flex items-center gap-1.5 transition shadow-sm active:scale-95">
+                    <i class="fa-solid fa-print"></i> 儲存 PDF
+                </button>
+            </div>
         </div>
     </header>
 
@@ -110,17 +121,19 @@
                         <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block shadow-sm">🚨 17:00 離開市區，18:00 前抵達機場</div>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1 relative">
-                    <div class="text-xs text-gray-500 font-bold">🏨 住宿資訊（連續入住 4 晚）</div>
-                    <div class="font-bold text-gray-900 text-base">嵐 Hotel Arashi 日本橋 2 號店</div>
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="text-xs text-gray-500 font-bold">🏨 住宿資訊（連續入住 4 晚）</div>
+                            <div class="font-bold text-gray-900 text-base mt-0.5">嵐 Hotel Arashi 日本橋 2 號店</div>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Arashi+Nippombashi+2+No.008+%E5%A4%A7%E9%98%AA%E5%B8%82%E6%B5%AA%E9%80%9F%E5%8C%BA%E6%97%A5%E6%9C%AC%E6%A9%8B5-6-19" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-xs transition-colors shadow-sm no-print">
+                            <i class="fa-solid fa-location-dot"></i> 飯店導航
+                        </a>
+                    </div>
                     <div class="text-gray-700"><span class="font-medium">地址：</span>大阪市浪速区日本橋5-6-19</div>
-                    <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A/2 號出口</div>
-                    <div class="text-gray-500 text-xs pt-1">入住：16:00 / 退房：11:00</div>
-                    
-                    <!-- 飯店專屬導航按鈕 -->
-                    <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Arashi+Nippombashi+2+No.008+大阪" target="_blank" class="absolute right-4 bottom-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold border border-blue-300 rounded-lg text-xs transition-colors shadow-sm no-print">
-                        <i class="fa-solid fa-location-dot"></i> 飯店導航
-                    </a>
+                    <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A/2 號出口步行即達</div>
+                    <div class="text-gray-500 text-xs pt-1">入住：16:00 Check-in / 退房：11:00 Check-out</div>
                 </div>
             </div>
         </section>
@@ -131,22 +144,26 @@
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-clipboard-check text-red-800"></i> 出發前打包檢查表
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <p class="text-xs text-gray-500 mb-3">💡 勾選狀態會自動保存在您的手機瀏覽器中，方便隨時確認進度：</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" id="checklist-container">
                     <div class="border p-3.5 rounded-xl bg-gray-50">
                         <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件與財物</h3>
                         <div class="space-y-2 text-gray-700">
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span><strong class="text-red-700">護照正本</strong>（效期需 6 個月以上）</span></label>
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>海外刷卡信用卡（建議準備 2 張備用）</span></label>
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>ICOCA 或綁定 Apple Pay Suica</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-1" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-red-700">護照正本</strong>（效期需 6 個月以上）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-2" class="check-item rounded text-red-800 mt-1"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-3" class="check-item rounded text-red-800 mt-1"> <span>海外刷卡信用卡（建議準備 2 張備用）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-4" class="check-item rounded text-red-800 mt-1"> <span>ICOCA 或綁定 Apple Pay Suica</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-5" class="check-item rounded text-red-800 mt-1"> <span>Visit Japan Web QR Code 截圖</span></label>
                         </div>
                     </div>
                     <div class="border p-3.5 rounded-xl bg-gray-50">
-                        <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">🔌 3C 電子產品</h3>
+                        <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">🔌 3C 與生活必備</h3>
                         <div class="space-y-2 text-gray-700">
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>手機、日本上網卡與充電線</span></label>
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span><strong>行動電源</strong>（隨身攜帶，不可托運）</span></label>
-                            <label class="flex items-start space-x-2"><input type="checkbox" class="rounded text-red-800 mt-1"> <span>多孔充電頭 / 延長線</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-1" class="check-item rounded text-red-800 mt-1"> <span>手機、日本上網卡 (eSIM/SIM) 與充電線</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-2" class="check-item rounded text-red-800 mt-1"> <span><strong>行動電源</strong>（隨身攜帶，不可托運）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-3" class="check-item rounded text-red-800 mt-1"> <span>多孔充電頭 / 零錢包 / 環保購物袋</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-4" class="check-item rounded text-red-800 mt-1"> <span>個人常備藥（腸胃藥、止痛藥、休足時間）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-5" class="check-item rounded text-red-800 mt-1"> <span>好走的運動鞋與輕便雨具</span></label>
                         </div>
                     </div>
                 </div>
@@ -168,7 +185,7 @@
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
                             <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>⚠️ <span class="underline">每人最多 2 顆。</span> 嚴禁在飛機上幫手機充電，且不可放上方行李櫃，必須放隨身包包。</li>
                             <li><strong class="text-red-800">護照與貴重物品：</strong>現金、信用卡。</li>
-                            <li><strong class="text-gray-900">打火機：</strong>每人限帶 1 個「普通」打火機。</li>
+                            <li><strong class="text-gray-900">打火機：</strong>每人限帶 1 個「普通」打火機（防風打火機禁帶）。</li>
                         </ul>
                     </div>
                     
@@ -178,7 +195,7 @@
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
                             <li><strong class="text-blue-900">大於 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭</strong>，只要單罐大於100ml就必須托運！</li>
                             <li><strong class="text-blue-900">刀具與尖銳物：</strong>剪刀、指甲剪、修眉刀。</li>
-                            <li><strong class="text-blue-900">長傘與腳架：</strong>長度超過 60 公分的腳架。</li>
+                            <li><strong class="text-blue-900">長傘與腳架：</strong>收合超過 60 公分的腳架或自拍桿。</li>
                         </ul>
                     </div>
                 </div>
@@ -255,13 +272,70 @@
     </main>
 
     <!-- 浮動返回頂部按鈕 -->
-    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-70 hover:bg-gray-900 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-50 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-75 hover:bg-gray-900 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-50 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
     <script>
+        let currentActiveTab = 'overview';
+        const CACHE_KEY = 'osaka_itinerary_csv_cache_v3';
+
+        // 對應天數的日期資訊
+        const DAY_DATES = {
+            1: '10/17 (六)',
+            2: '10/18 (日)',
+            3: '10/19 (一)',
+            4: '10/20 (二)',
+            5: '10/21 (三)'
+        };
+
+        // 內建大阪行程專屬精準地名庫（自動掃描標題與詳細說明，支援單筆行程多個景點獨立導航）
+        const KNOWN_PLACES = [
+            { label: '桃園機場 T1', keywords: ['桃園機場', '桃園國際機場'], query: '桃園國際機場第一航廈' },
+            { label: '關西機場 T1', keywords: ['關西機場', '關西國際機場'], query: '関西国際空港 第1ターミナル' },
+            { label: '嵐飯店 日本橋', keywords: ['Check-in', '飯店入住', 'Hotel Arashi', '嵐 Hotel'], query: 'Hotel Arashi Nippombashi 2 No.008 大阪市浪速区日本橋5-6-19' },
+            { label: '大阪王將 惠美須町', keywords: ['大阪王將'], query: '大阪王将 恵美須町店' },
+            { label: '拉麵なにわ新風', keywords: ['なにわ新風'], query: 'ラーメン なにわ新風 恵美須町店' },
+            { label: '大阪生活今昔館', keywords: ['天神橋筋六丁目', '生活今昔館', '今昔館'], query: '大阪くらしの今昔館' },
+            { label: '天神橋筋商店街', keywords: ['天神橋筋商店街'], query: '天神橋筋商店街 大阪' },
+            { label: '大阪天滿宮', keywords: ['天滿宮', '天満宮'], query: '大阪天満宮' },
+            { label: 'WANAKA 章魚燒', keywords: ['WANAKA', 'わなか'], query: 'たこ焼道楽 わなか 天満店' },
+            { label: '新世界本通商店街', keywords: ['新世界本通'], query: '新世界本通商店街 大阪' },
+            { label: 'kankan 章魚燒', keywords: ['kankan', 'かんかん'], query: 'たこ焼き かんかん 新世界' },
+            { label: '勝尾寺', keywords: ['勝尾寺'], query: '勝尾寺 大阪府箕面市' },
+            { label: 'KYK 豬排 (阪急32番街)', keywords: ['KYK', '阪急 32', '阪急32'], query: 'とんかつKYK 阪急32番街店' },
+            { label: 'hololive 梅田店', keywords: ['hololive', '阪急三番街'], query: '阪急三番街 北館 大阪梅田' },
+            { label: 'YONEX 梅田展售店', keywords: ['YONEX OSAKA', 'GRAND FRONT', 'YONEX展售店'], query: 'YONEX OSAKA SHOWROOM グランフロント大阪' },
+            { label: '新梅田食道街 (HANAKO)', keywords: ['新梅田食道街', 'HANAKO'], query: '新梅田食道街' },
+            { label: '露天神社 (お初天神)', keywords: ['露天神社'], query: '露天神社 お初天神 大阪' },
+            { label: '心齋橋筋商店街', keywords: ['心齋橋筋商店街'], query: '心斎橋筋商店街' },
+            { label: 'Apple 心齋橋', keywords: ['Apple 心齋橋', 'Apple心齋橋'], query: 'Apple 心斎橋' },
+            { label: 'Bic Camera 難波店', keywords: ['Bic Camera'], query: 'ビックカメラ なんば店' },
+            { label: 'Round One 千日前', keywords: ['Round One', 'Round1'], query: 'ラウンドワンスタジアム 千日前店' },
+            { label: '國產牛燒肉 あぶりや', keywords: ['あぶりや', '国産牛燒肉', '國產牛燒肉'], query: '国産牛焼肉食べ放題 あぶりや 千日前店' },
+            { label: '大阪城天守閣', keywords: ['大阪城公園', '大阪城天守閣', '參觀大阪城'], query: '大阪城天守閣' },
+            { label: '大阪城御座船', keywords: ['御座船'], query: '大阪城御座船 乗船場' },
+            { label: '天保山大摩天輪', keywords: ['天保山', '摩天輪'], query: '天保山大観覧車 大阪港' },
+            { label: '聖瑪麗亞號觀光船', keywords: ['聖瑪麗亞號'], query: '帆船型観光船 サンタマリア のりば' },
+            { label: '梅田藍天大廈空中庭園', keywords: ['藍天大廈', '空中庭園'], query: '梅田スカイビル 空中庭園展望台' },
+            { label: '絹谷幸二天空美術館', keywords: ['天空美術館', '絹谷幸二'], query: '絹谷幸二 天空美術館' },
+            { label: '鳥貴族', keywords: ['鳥貴族'], query: '鳥貴族 道頓堀' },
+            { label: '四天王寺', keywords: ['四天王寺'], query: '四天王寺 大阪' },
+            { label: '天王寺動物園', keywords: ['天王寺動物園'], query: '天王寺動物園 大阪' },
+            { label: '大阪市立美術館', keywords: ['市立美術館'], query: '大阪市立美術館' },
+            { label: '通天閣 (溜滑梯)', keywords: ['通天閣', 'TOWER SLIDER'], query: '通天閣 大阪' },
+            { label: '道頓堀觀光遊船', keywords: ['道頓堀遊船', '道頓堀觀光遊船'], query: 'とんぼりリバークルーズ 道頓堀' },
+            { label: '燒肉力丸 難波湊町店', keywords: ['燒肉力丸', '焼肉力丸', '湊町'], query: '焼肉力丸 なんば湊町店' },
+            { label: 'Fandom Namba 動漫店', keywords: ['Fandom'], query: 'Fandom Namba 大阪日本橋' },
+            { label: 'Animate 大阪日本橋', keywords: ['Animate', '安利美特'], query: 'アニメイト大阪日本橋' },
+            { label: '難波八坂神社', keywords: ['難波八坂神社', '八坂神社', '八阪神社'], query: '難波八阪神社' },
+            { label: '今宮戎神社', keywords: ['今宮戎神社'], query: '今宮戎神社 大阪' },
+            { label: '玉出超市 日本橋店', keywords: ['玉出超市', '超市最後補貨'], query: 'スーパー玉出 日本橋店' }
+        ];
+
         // 切換分頁邏輯
         function switchTab(tabId) {
+            currentActiveTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             const targetTab = document.getElementById('tab-' + tabId);
             if (targetTab) targetTab.classList.remove('hidden');
@@ -296,121 +370,338 @@
             return arr;
         }
 
-        // 讀取並渲染 Google 試算表資料
-        async function loadGoogleSheet() {
-            // 您的 CSV 連結
-            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQZhCES9RZqQptYj1raYD1iyPVPKH78FtuYtu9sbI0VhzrkH-52ebzp5Qiekf3MhCB1Z2lDf2LJbD12/pub?gid=283976823&single=true&output=csv";
+        // 嚴格判斷並標準化「Day」欄位（左邊未排天數、空白或備案的項目一律過濾忽略）
+        function parseValidDay(rawDay) {
+            if (!rawDay) return null;
+            const str = rawDay.trim();
+            if (!str) return null;
 
-            try {
-                const response = await fetch(sheetUrl + "&t=" + new Date().getTime()); 
-                const csvText = await response.text();
-                const data = parseCSV(csvText);
+            // 支援格式: "Day 1", "Day1", "D1", "第1天", "Day 1 (10/17)", 或純數字 "1"~"9"
+            const matchNum = str.match(/^(?:day\s*|d\s*|第\s*)?([1-9]\d?)\s*(?:天|日)?(?:\s*[\(（].*[\)）])?$/i);
+            if (matchNum) {
+                const num = parseInt(matchNum[1], 10);
+                return { num: num, label: `Day ${num}` };
+            }
 
-                const schedule = data.slice(1).filter(row => row.length >= 3 && row[0].trim() !== '');
+            // 支援中文天數: "第一天" ~ "第七天"
+            const cnNums = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7 };
+            const matchCn = str.match(/^第([一二三四五六七])天/);
+            if (matchCn && cnNums[matchCn[1]]) {
+                const num = cnNums[matchCn[1]];
+                return { num: num, label: `Day ${num}` };
+            }
 
-                // 依 Day 分群，並新增讀取 F 欄 (row[5]) 的導航地名
-                const daysMap = new Map();
-                schedule.forEach(row => {
-                    const day = row[0].trim();
-                    if (!daysMap.has(day)) daysMap.set(day, []);
-                    daysMap.get(day).push({
-                        time: row[1] ? row[1].trim() : '',
-                        title: row[2] ? row[2].trim() : '',
-                        detail: row[3] ? row[3].trim() : '',
-                        category: row[4] ? row[4].trim() : '',
-                        location: row[5] ? row[5].trim() : '' // 讀取 F 欄位
+            // 支援直接填日期: "10/17" ~ "10/21"
+            const dateMap = { '10/17': 1, '10/18': 2, '10/19': 3, '10/20': 4, '10/21': 5 };
+            for (const [dateKey, dNum] of Object.entries(dateMap)) {
+                if (str.startsWith(dateKey)) {
+                    return { num: dNum, label: `Day ${dNum}` };
+                }
+            }
+
+            // 左邊未排天數或非天數格式的一律忽略不顯示
+            return null;
+        }
+
+        // 將時間字串轉為分鐘數以便排序
+        function parseTimeMinutes(timeStr) {
+            if (!timeStr) return 9999;
+            const match = timeStr.trim().match(/(\d{1,2})\s*[:：點時]\s*(\d{1,2})?/);
+            if (match) {
+                const hours = parseInt(match[1], 10);
+                const mins = match[2] ? parseInt(match[2], 10) : 0;
+                return hours * 60 + mins;
+            }
+            return 9999;
+        }
+
+        // 將查詢字串轉為 Google Maps URL
+        function toGoogleMapsUrl(queryStr) {
+            if (/^https?:\/\//i.test(queryStr)) return queryStr;
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryStr)}`;
+        }
+
+        // 智慧型導航解析器（支援 F 欄優先、單筆行程自動拆解多個子景點導航、排除非地點動作）
+        function resolveNavLinks(item) {
+            // 1. 若 F 欄 (Location) 有填寫，最高優先使用（支援用逗號或頓號分隔多個地點）
+            if (item.location) {
+                const parts = item.location.split(/[、,，/]/).map(s => s.trim()).filter(Boolean);
+                if (parts.length > 0) {
+                    return parts.map(p => ({
+                        label: p,
+                        url: toGoogleMapsUrl(p.includes('桃園') || p.includes('大阪') ? p : `${p} 大阪`)
+                    }));
+                }
+            }
+
+            // 2. 排除不需導航的純動作事件（如退房、起飛返台）
+            if (/退房|Check-out|起飛返台|收行李/i.test(item.title)) {
+                return [];
+            }
+
+            // 3. 掃描標題與詳細說明，比對內建大阪精準地名庫（可同時匹配同一筆行程內的多個景點）
+            const combinedText = `${item.title} ${item.detail}`;
+            const matchedPlaces = [];
+            for (const entry of KNOWN_PLACES) {
+                if (entry.keywords.some(kw => combinedText.includes(kw))) {
+                    matchedPlaces.push({
+                        label: entry.label,
+                        url: toGoogleMapsUrl(entry.query)
                     });
+                }
+            }
+
+            if (matchedPlaces.length > 0) {
+                return matchedPlaces;
+            }
+
+            // 4. 若為新增的未知景點，自動清理「午餐：」「出發前往」等非地名前綴詞後導航
+            let cleanTitle = item.title
+                .replace(/^(早餐|午餐|晚餐|早午餐|宵夜|下午茶|上午|中午|下午|午後|傍晚|夜間|晚上|出發前往|前往|離開市區前往|抵達|參拜|體驗)\s*[:：]?\s*/g, '')
+                .replace(/櫃檯報到|刺激體驗|商圈巡禮|逛街|晚餐|午餐/g, '')
+                .trim();
+
+            if (!cleanTitle || cleanTitle.length < 2) return [];
+
+            const fallbackQuery = cleanTitle.includes('大阪') || cleanTitle.includes('機場')
+                ? cleanTitle
+                : `${cleanTitle} 大阪`;
+            return [{
+                label: cleanTitle,
+                url: toGoogleMapsUrl(fallbackQuery)
+            }];
+        }
+
+        // 將文字中的網址自動轉為超連結並處理換行
+        function formatDetailText(text) {
+            if (!text) return '';
+            const escaped = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            const linked = escaped.replace(
+                /(https?:\/\/[^\s<]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline break-all hover:text-blue-800"><i class="fa-solid fa-arrow-up-right-from-square text-[10px] mr-0.5"></i>開啟連結</a>'
+            );
+            return linked.replace(/\n/g, '<br>');
+        }
+
+        // 渲染試算表資料至畫面
+        function renderScheduleFromCSV(csvText, isCached = false) {
+            const data = parseCSV(csvText);
+            const daysMap = new Map();
+
+            data.slice(1).forEach((row, originalIdx) => {
+                if (!row || row.length < 3) return;
+                const parsedDay = parseValidDay(row[0]);
+                const title = row[2] ? row[2].trim() : '';
+
+                // 嚴格過濾：左邊沒有排天數（或無標題）的列一律忽略不計
+                if (!parsedDay || !title) return;
+
+                if (!daysMap.has(parsedDay.num)) {
+                    daysMap.set(parsedDay.num, {
+                        label: parsedDay.label,
+                        items: []
+                    });
+                }
+
+                const timeStr = row[1] ? row[1].trim() : '';
+                daysMap.get(parsedDay.num).items.push({
+                    time: timeStr,
+                    timeMinutes: parseTimeMinutes(timeStr),
+                    originalIdx: originalIdx,
+                    title: title,
+                    detail: row[3] ? row[3].trim() : '',
+                    category: row[4] ? row[4].trim() : '',
+                    location: row[5] ? row[5].trim() : ''
+                });
+            });
+
+            // 依天數由小到大排序 (Day 1 -> Day 5)
+            const sortedDays = Array.from(daysMap.entries()).sort((a, b) => a[0] - b[0]);
+
+            const navContainer = document.getElementById('main-nav');
+            const sectionsContainer = document.getElementById('dynamic-sections-container');
+            const loader = document.getElementById('loading-indicator');
+            if (loader) loader.remove();
+
+            navContainer.querySelectorAll('.dynamic-day-btn').forEach(el => el.remove());
+            sectionsContainer.innerHTML = '';
+
+            sortedDays.forEach(([dayNum, dayObj]) => {
+                const tabId = 'day' + dayNum;
+                const dayName = dayObj.label;
+                const dateSubtitle = DAY_DATES[dayNum] ? ` · ${DAY_DATES[dayNum]}` : '';
+
+                // 同一天內依時間自動排序，若無填時間則保持試算表順序
+                const items = dayObj.items.sort((a, b) => {
+                    if (a.timeMinutes !== 9999 && b.timeMinutes !== 9999) {
+                        return a.timeMinutes - b.timeMinutes;
+                    }
+                    return a.originalIdx - b.originalIdx;
                 });
 
-                const navContainer = document.getElementById('main-nav');
-                const sectionsContainer = document.getElementById('dynamic-sections-container');
-                const loader = document.getElementById('loading-indicator');
-                if (loader) loader.remove();
+                // 1. 生成上方導覽按鈕
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn dynamic-day-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
+                btn.id = 'btn-' + tabId;
+                btn.innerText = dayName;
+                btn.onclick = () => switchTab(tabId);
+                navContainer.appendChild(btn);
 
-                // 生成天數按鈕與內容
-                let dayIndex = 1;
-                daysMap.forEach((items, dayName) => {
-                    const tabId = 'day' + dayIndex;
+                // 2. 生成行程區塊 HTML（RWD 完美對齊設計：時間與分類標籤固定於頂部左側、導航固定於頂部右側、標題獨立一行）
+                const section = document.createElement('section');
+                section.id = 'tab-' + tabId;
+                section.className = 'tab-content hidden print-page space-y-4';
 
-                    // 1. 導覽按鈕
-                    const btn = document.createElement('button');
-                    btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
-                    btn.id = 'btn-' + tabId;
-                    btn.innerText = dayName;
-                    btn.onclick = () => switchTab(tabId);
-                    navContainer.appendChild(btn);
+                let timelineHtml = items.map(item => {
+                    // 處理分類標籤顏色
+                    let badgeHtml = '';
+                    if (item.category) {
+                        let badgeColor = 'bg-gray-100 text-gray-600 border-gray-200';
+                        if (item.category.includes('美食') || item.category.includes('餐')) badgeColor = 'bg-orange-50 text-orange-700 border-orange-200';
+                        else if (item.category.includes('景點') || item.category.includes('玩')) badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+                        else if (item.category.includes('購物') || item.category.includes('逛')) badgeColor = 'bg-pink-50 text-pink-700 border-pink-200';
+                        else if (item.category.includes('交通') || item.category.includes('機場')) badgeColor = 'bg-green-50 text-green-700 border-green-200';
+                        else if (item.category.includes('住宿') || item.category.includes('飯店')) badgeColor = 'bg-purple-50 text-purple-700 border-purple-200';
+                        
+                        badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border ${badgeColor}">${item.category}</span>`;
+                    }
 
-                    // 2. 行程區塊 HTML
-                    const section = document.createElement('section');
-                    section.id = 'tab-' + tabId;
-                    section.className = 'tab-content hidden print-page space-y-4';
+                    const timeHtml = item.time
+                        ? `<span class="inline-flex items-center text-red-800 bg-red-50 px-2 py-0.5 rounded-md border border-red-100 text-xs font-mono font-bold tracking-wide">${item.time}</span>`
+                        : '';
 
-                    let timelineHtml = items.map(item => {
-                        // 處理分類標籤顏色
-                        let badgeHtml = '';
-                        if (item.category) {
-                            let badgeColor = 'bg-gray-100 text-gray-600 border-gray-200';
-                            if (item.category.includes('美食')) badgeColor = 'bg-orange-50 text-orange-700 border-orange-200';
-                            else if (item.category.includes('景點')) badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
-                            else if (item.category.includes('交通') || item.category.includes('機場')) badgeColor = 'bg-green-50 text-green-700 border-green-200';
-                            else if (item.category.includes('住宿')) badgeColor = 'bg-purple-50 text-purple-700 border-purple-200';
-                            
-                            badgeHtml = `<span class="inline-block bg-white px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeColor} align-middle ml-1.5 mb-0.5">${item.category}</span>`;
-                        }
+                    // 解析導航連結（單一地點顯示右上角導航按鈕；多地點額外在底部顯示分點導航小標籤）
+                    const navLinks = resolveNavLinks(item);
+                    const primaryNav = navLinks.length > 0 ? navLinks[0] : null;
+                    const navButtonHtml = primaryNav
+                        ? `<a href="${primaryNav.url}" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-xs transition-colors shadow-sm active:scale-95 no-print">
+                            <i class="fa-solid fa-location-dot"></i> 導航
+                           </a>`
+                        : '';
 
-                        // 判斷是否顯示導航按鈕 (只有在 F 欄填寫時才顯示)
-                        let navButtonHtml = '';
-                        if (item.location) {
-                            // 自動在關鍵字後方加上大阪，提高精準度
-                            let mapQuery = encodeURIComponent(item.location + ' 大阪');
-                            navButtonHtml = `
-                            <a href="https://www.google.com/maps/search/?api=1&query=${mapQuery}" target="_blank" class="absolute right-3 top-3 inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-xs transition-colors shadow-sm active:scale-95 no-print z-10">
-                                <i class="fa-solid fa-location-dot"></i> 導航
-                            </a>`;
-                        }
+                    const multiNavChipsHtml = navLinks.length > 1
+                        ? `<div class="mt-2.5 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5 no-print">
+                            ${navLinks.map(link => `
+                                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50/70 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-full text-[11px] font-medium transition-colors active:scale-95">
+                                    <i class="fa-solid fa-location-arrow text-[10px]"></i> ${link.label}
+                                </a>
+                            `).join('')}
+                           </div>`
+                        : '';
 
-                        // 全新防跑版 RWD 結構
-                        return `
-                        <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2 mt-4">
-                            <!-- 時間軸紅點 -->
-                            <div class="absolute -left-[30px] top-4 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
-                            
-                            <!-- 導航按鈕 (絕對定位於右上角) -->
-                            ${navButtonHtml}
-                            
-                            <!-- 標題與標籤容器 (加上 pr-16 避免文字壓到導航按鈕) -->
-                            <div class="${item.location ? 'pr-16' : 'pr-2'}">
-                                <div class="font-bold text-gray-900 leading-snug">
-                                    ${item.time ? `<span class="inline-block text-red-800 mr-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-sm tracking-wide mb-0.5">${item.time}</span>` : ''} 
-                                    <span class="text-[15px] align-middle">${item.title}</span>
-                                    ${badgeHtml}
-                                </div>
+                    const hasTopBar = timeHtml || badgeHtml || navButtonHtml;
+
+                    return `
+                    <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2 mt-4 hover:border-red-200 transition-colors">
+                        <!-- 時間軸紅點 -->
+                        <div class="absolute -left-[30px] top-4 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
+                        
+                        <!-- 第一排：左側 [時間 + 分類標籤] 固定同行，右側 [導航按鈕] 絕不跑版 -->
+                        ${hasTopBar ? `
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                ${timeHtml}
+                                ${badgeHtml}
                             </div>
+                            ${navButtonHtml}
+                        </div>` : ''}
 
-                            <!-- 詳細說明 -->
-                            ${item.detail ? `<div class="mt-2.5 text-xs text-gray-600 bg-gray-50 p-2.5 rounded border border-gray-100 leading-relaxed">${item.detail}</div>` : ''}
+                        <!-- 第二排：行程標題獨立完整一行，任何螢幕寬度都不會被擠壓 -->
+                        <div class="font-bold text-gray-900 text-[15px] sm:text-base leading-snug break-words">
+                            ${item.title}
                         </div>
-                        `;
-                    }).join('');
 
-                    section.innerHTML = `
-                    <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">
-                        <div class="flex justify-between items-center border-b border-gray-300 pb-3 mb-5">
-                            <h2 class="text-xl font-bold text-gray-900 inline"><i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName} 專屬行程</h2>
-                        </div>
-                        <div class="relative border-l-[3px] border-red-200 ml-2 pl-3">
-                            ${timelineHtml}
-                        </div>
+                        <!-- 第三排：詳細說明 -->
+                        ${item.detail ? `<div class="mt-2.5 text-xs text-gray-600 bg-gray-50 p-2.5 rounded-lg border border-gray-100 leading-relaxed break-words">${formatDetailText(item.detail)}</div>` : ''}
+
+                        <!-- 第四排：若該時段包含多個餐廳或子景點，自動生成各別導航按鈕 -->
+                        ${multiNavChipsHtml}
                     </div>
                     `;
-                    sectionsContainer.appendChild(section);
-                    dayIndex++;
-                });
+                }).join('');
 
-            } catch (error) {
-                console.error("載入行程失敗:", error);
-                document.getElementById('loading-indicator').innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 網路錯誤，無法讀取最新行程';
+                section.innerHTML = `
+                <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-3 mb-5">
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
+                            <i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName}${dateSubtitle}
+                        </h2>
+                        <span class="text-xs font-bold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200 shadow-sm shrink-0">
+                            共 ${items.length} 個行程
+                        </span>
+                    </div>
+                    <div class="relative border-l-[3px] border-red-200 ml-2 pl-3">
+                        ${timelineHtml}
+                    </div>
+                </div>
+                `;
+                sectionsContainer.appendChild(section);
+            });
+
+            if (currentActiveTab && document.getElementById('tab-' + currentActiveTab)) {
+                switchTab(currentActiveTab);
             }
+
+            const syncBadge = document.getElementById('sync-badge');
+            if (syncBadge) {
+                syncBadge.innerText = isCached ? '離線快取版' : '已同步最新';
+                syncBadge.className = isCached
+                    ? 'text-[11px] bg-amber-600 px-1.5 py-0.5 rounded shadow-sm font-normal'
+                    : 'text-[11px] bg-green-700 px-1.5 py-0.5 rounded shadow-sm font-normal';
+            }
+        }
+
+        // 讀取並渲染 Google 試算表資料
+        async function loadGoogleSheet(isManualRefresh = false) {
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQZhCES9RZqQptYj1raYD1iyPVPKH78FtuYtu9sbI0VhzrkH-52ebzp5Qiekf3MhCB1Z2lDf2LJbD12/pub?gid=283976823&single=true&output=csv";
+            const refreshIcon = document.getElementById('refreshIcon');
+            if (isManualRefresh && refreshIcon) {
+                refreshIcon.classList.add('fa-spin');
+            }
+
+            try {
+                const response = await fetch(sheetUrl + "&t=" + new Date().getTime(), { cache: 'no-store' });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const csvText = await response.text();
+
+                try {
+                    localStorage.setItem(CACHE_KEY, csvText);
+                } catch (e) {}
+
+                renderScheduleFromCSV(csvText, false);
+            } catch (error) {
+                console.error("載入最新行程失敗，嘗試讀取快取:", error);
+                const cachedCSV = localStorage.getItem(CACHE_KEY);
+                if (cachedCSV) {
+                    renderScheduleFromCSV(cachedCSV, true);
+                } else {
+                    const loader = document.getElementById('loading-indicator');
+                    if (loader) {
+                        loader.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i> 網路不穩，請點擊右上角重新同步';
+                    }
+                }
+            } finally {
+                if (isManualRefresh && refreshIcon) {
+                    setTimeout(() => refreshIcon.classList.remove('fa-spin'), 400);
+                }
+            }
+        }
+
+        // 行李檢查表勾選記憶功能
+        function initChecklistStorage() {
+            const checkboxes = document.querySelectorAll('.check-item');
+            checkboxes.forEach(cb => {
+                const key = 'osaka_check_' + cb.getAttribute('data-check');
+                if (localStorage.getItem(key) === 'true') {
+                    cb.checked = true;
+                }
+                cb.addEventListener('change', () => {
+                    localStorage.setItem(key, cb.checked ? 'true' : 'false');
+                });
+            });
         }
 
         // 監聽滾動事件：顯示「返回頂部」按鈕
@@ -428,6 +719,7 @@
         // 頁面載入後初始化
         document.addEventListener('DOMContentLoaded', () => {
             loadGoogleSheet();
+            initChecklistStorage();
             const printBtn = document.getElementById('printBtn');
             if (printBtn) printBtn.addEventListener('click', () => window.print());
         });
