@@ -31,7 +31,13 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-gray-800 pb-12 relative">
+<body class="text-gray-800 pb-14 relative">
+
+    <!-- 複製成功提示 Toast -->
+    <div id="copy-toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg z-50 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-1.5 no-print">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="copy-toast-text">已複製到剪貼簿！</span>
+    </div>
 
     <!-- 頂部標題與工具列 -->
     <header class="bg-red-800 text-white shadow-md sticky top-0 z-50 no-print">
@@ -92,9 +98,9 @@
                     <div class="text-sm font-bold text-gray-800">15~23°C</div>
                 </div>
                 <div class="flex-1 border-r border-blue-200">
-                    <i class="fa-solid fa-yen-sign text-blue-500 mb-1.5 text-xl block"></i>
-                    <div class="text-xs text-blue-900 font-bold">預估匯率</div>
-                    <div class="text-sm font-bold text-gray-800">約 0.22</div>
+                    <i class="fa-solid fa-ticket text-blue-500 mb-1.5 text-xl block"></i>
+                    <div class="text-xs text-blue-900 font-bold">周遊卡使用</div>
+                    <div class="text-sm font-bold text-orange-700">Day 3 & Day 4</div>
                 </div>
                 <div class="flex-1">
                     <i class="fa-solid fa-plug text-blue-500 mb-1.5 text-xl block"></i>
@@ -136,23 +142,74 @@
                     <div class="text-gray-500 text-xs pt-1">入住：16:00 Check-in / 退房：11:00 Check-out</div>
                 </div>
             </div>
+
+            <!-- 5日交通與行程配置總覽（會隨試算表自動更新摘要） -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-map-location-dot text-red-800"></i> 5 日交通票券與行程配置
+                </h2>
+                <div id="overview-days-summary" class="space-y-2.5 text-sm">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200">
+                        <div>
+                            <span class="font-bold text-gray-900">Day 1 · 10/17 (六)</span>
+                            <p class="text-xs text-gray-600 mt-0.5">關西機場抵達 ➔ 天神橋筋・天滿宮 ➔ 新世界本通</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold bg-green-100 text-green-800 px-2.5 py-1 rounded-full border border-green-200">💳 Suica / ICOCA</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200">
+                        <div>
+                            <span class="font-bold text-gray-900">Day 2 · 10/18 (日)</span>
+                            <p class="text-xs text-gray-600 mt-0.5">勝尾寺祈福 ➔ 梅田商圈巡禮 ➔ 心齋橋・難波燒肉</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold bg-green-100 text-green-800 px-2.5 py-1 rounded-full border border-green-200">💳 Suica / ICOCA</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200">
+                        <div>
+                            <span class="font-bold text-gray-900">Day 3 · 10/19 (一)</span>
+                            <p class="text-xs text-gray-600 mt-0.5">大阪城・御座船 ➔ 大阪港摩天輪・聖瑪麗亞號 ➔ 藍天大廈 ➔ 今昔館</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold bg-orange-100 text-orange-800 px-2.5 py-1 rounded-full border border-orange-300">🎟️ 大阪周遊卡 D1</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200">
+                        <div>
+                            <span class="font-bold text-gray-900">Day 4 · 10/20 (二)</span>
+                            <p class="text-xs text-gray-600 mt-0.5">四天王寺 ➔ 天王寺動物園・美術館 ➔ 通天閣 ➔ 道頓堀遊船</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold bg-orange-100 text-orange-800 px-2.5 py-1 rounded-full border border-orange-300">🎟️ 大阪周遊卡 D2</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200">
+                        <div>
+                            <span class="font-bold text-gray-900">Day 5 · 10/21 (三)</span>
+                            <p class="text-xs text-gray-600 mt-0.5">日本橋動漫街 ➔ 難波八坂神社・今宮戎神社・超市補貨 ➔ 關西機場</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold bg-green-100 text-green-800 px-2.5 py-1 rounded-full border border-green-200">💳 Suica / ICOCA</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- === 2. 行李檢查 === -->
         <section id="tab-checklist" class="tab-content hidden print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-clipboard-check text-red-800"></i> 出發前打包檢查表
-                </h2>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-red-800"></i> 出發前打包檢查表
+                    </h2>
+                    <div class="flex items-center gap-2 no-print">
+                        <span id="checklist-progress" class="text-xs font-bold text-red-800 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">進度 0/11</span>
+                        <button type="button" onclick="resetChecklist()" class="text-xs text-gray-500 hover:text-red-700 underline">重置</button>
+                    </div>
+                </div>
                 <p class="text-xs text-gray-500 mb-3">💡 勾選狀態會自動保存在您的手機瀏覽器中，方便隨時確認進度：</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" id="checklist-container">
                     <div class="border p-3.5 rounded-xl bg-gray-50">
-                        <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件與財物</h3>
+                        <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件、票券與財物</h3>
                         <div class="space-y-2 text-gray-700">
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-1" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-red-700">護照正本</strong>（效期需 6 個月以上）</span></label>
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-2" class="check-item rounded text-red-800 mt-1"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-3" class="check-item rounded text-red-800 mt-1"> <span>海外刷卡信用卡（建議準備 2 張備用）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-4" class="check-item rounded text-red-800 mt-1"> <span>ICOCA 或綁定 Apple Pay Suica</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-4" class="check-item rounded text-red-800 mt-1"> <span><strong>Suica / ICOCA</strong>（Day 1、2、5 搭車用）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-6" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-orange-700">大阪周遊卡 2日券憑證</strong>（Day 3、4 使用）</span></label>
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-5" class="check-item rounded text-red-800 mt-1"> <span>Visit Japan Web QR Code 截圖</span></label>
                         </div>
                     </div>
@@ -163,7 +220,7 @@
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-2" class="check-item rounded text-red-800 mt-1"> <span><strong>行動電源</strong>（隨身攜帶，不可托運）</span></label>
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-3" class="check-item rounded text-red-800 mt-1"> <span>多孔充電頭 / 零錢包 / 環保購物袋</span></label>
                             <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-4" class="check-item rounded text-red-800 mt-1"> <span>個人常備藥（腸胃藥、止痛藥、休足時間）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-5" class="check-item rounded text-red-800 mt-1"> <span>好走的運動鞋與輕便雨具</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-5" class="check-item rounded text-red-800 mt-1"> <span>好走的運動鞋與輕便摺疊傘</span></label>
                         </div>
                     </div>
                 </div>
@@ -184,7 +241,7 @@
                         <p class="text-xs text-red-700 font-semibold bg-white p-1 rounded inline-block shadow-sm">❌ 放托運行李會被退回開箱</p>
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
                             <li><strong class="text-red-800">行動電源 / 鋰電池：</strong>⚠️ <span class="underline">每人最多 2 顆。</span> 嚴禁在飛機上幫手機充電，且不可放上方行李櫃，必須放隨身包包。</li>
-                            <li><strong class="text-red-800">護照與貴重物品：</strong>現金、信用卡。</li>
+                            <li><strong class="text-red-800">護照與貴重物品：</strong>現金、信用卡、周遊卡憑證。</li>
                             <li><strong class="text-gray-900">打火機：</strong>每人限帶 1 個「普通」打火機（防風打火機禁帶）。</li>
                         </ul>
                     </div>
@@ -193,11 +250,17 @@
                         <div class="font-bold text-blue-900 text-base flex items-center gap-1.5"><i class="fa-solid fa-suitcase"></i> 必須【放托運行李箱】</div>
                         <p class="text-xs text-blue-800 font-semibold bg-white p-1 rounded inline-block shadow-sm">❌ 隨身攜帶過安檢會被直接沒收</p>
                         <ul class="list-disc list-inside space-y-1.5 text-gray-800 text-xs leading-relaxed">
-                            <li><strong class="text-blue-900">大於 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭</strong>，只要單罐大於100ml就必須托運！</li>
+                            <li><strong class="text-blue-900">大於 100ml 的液體/膏狀：</strong>洗面乳、化妝水、牙膏，甚至<strong class="text-red-600">布丁、果凍、罐頭、超市買的醬料</strong>，只要單罐大於100ml就必須托運！</li>
                             <li><strong class="text-blue-900">刀具與尖銳物：</strong>剪刀、指甲剪、修眉刀。</li>
                             <li><strong class="text-blue-900">長傘與腳架：</strong>收合超過 60 公分的腳架或自拍桿。</li>
                         </ul>
                     </div>
+                </div>
+
+                <div class="mt-4 bg-gray-50 p-3.5 rounded-xl border border-gray-200 text-xs text-gray-600 space-y-1">
+                    <div class="font-bold text-gray-800">🐯 台灣虎航行李規定提醒：</div>
+                    <div>• <strong>隨身手提行李：</strong>每人限 1 件手提行李 + 1 件個人隨身物品（共 2 件），總重量不得超過 <strong>10 公斤</strong>。</div>
+                    <div>• <strong>托運行李：</strong>依購買額度託運，單件行李不得超過 30 公斤（Day 5 超市採買的液體與免稅藥妝請放托運）。</div>
                 </div>
             </div>
         </section>
@@ -211,37 +274,88 @@
                 </h2>
                 <div class="space-y-3 text-gray-700">
                     <p>日本採電子化通關，建議出發前 <strong>3~5天</strong> 填寫，到機場就能快速通關！截圖存好 <strong>QR Code</strong> 以防沒網路。</p>
-                    <div class="border rounded-xl p-3 bg-gray-50 text-xs mt-3">
-                        <div class="font-bold text-gray-900 mb-1 border-b pb-1">📍 VJW 必填：第一晚住宿資料</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
-                            <div><span class="text-gray-500">都道府縣：</span><br><span class="font-bold text-sm">Osaka (大阪府)</span></div>
-                            <div><span class="text-gray-500">市区町村：</span><br><span class="font-bold text-sm">Naniwa-ku, Osaka-shi</span></div>
-                            <div class="sm:col-span-2"><span class="text-gray-500">町名札地 (Address)：</span><br><span class="font-bold text-sm">5-6-19 Nipponbashi</span></div>
-                            <div class="sm:col-span-2"><span class="text-gray-500">飯店名稱：</span><br><span class="font-bold text-sm">Hotel Arashi Nippombashi 2 No.008</span></div>
-                            <div class="sm:col-span-2"><span class="text-gray-500">聯絡電話：</span><br><span class="font-bold text-sm">+81 6-6631-0008</span></div>
+                    <div class="border rounded-xl p-3.5 bg-gray-50 text-xs mt-3">
+                        <div class="font-bold text-gray-900 mb-2 border-b pb-1.5 flex items-center justify-between">
+                            <span>📍 VJW 必填：第一晚住宿資料</span>
+                            <span class="text-[11px] text-gray-500 font-normal no-print">點擊右側按鈕可直接複製</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div class="bg-white p-2 rounded border border-gray-200">
+                                <span class="text-gray-500">都道府縣：</span><br>
+                                <span class="font-bold text-sm">Osaka (大阪府)</span>
+                            </div>
+                            <div class="bg-white p-2 rounded border border-gray-200">
+                                <span class="text-gray-500">市区町村：</span><br>
+                                <span class="font-bold text-sm">Naniwa-ku, Osaka-shi</span>
+                            </div>
+                            <div class="sm:col-span-2 bg-white p-2 rounded border border-gray-200 flex items-center justify-between gap-2">
+                                <div>
+                                    <span class="text-gray-500">町名番地 (Address)：</span><br>
+                                    <span class="font-bold text-sm font-mono">5-6-19 Nipponbashi</span>
+                                </div>
+                                <button type="button" onclick="copyText('5-6-19 Nipponbashi')" class="shrink-0 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium no-print">複製</button>
+                            </div>
+                            <div class="sm:col-span-2 bg-white p-2 rounded border border-gray-200 flex items-center justify-between gap-2">
+                                <div>
+                                    <span class="text-gray-500">飯店名稱 (Hotel Name)：</span><br>
+                                    <span class="font-bold text-sm font-mono">Hotel Arashi Nippombashi 2 No.008</span>
+                                </div>
+                                <button type="button" onclick="copyText('Hotel Arashi Nippombashi 2 No.008')" class="shrink-0 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium no-print">複製</button>
+                            </div>
+                            <div class="sm:col-span-2 bg-white p-2 rounded border border-gray-200 flex items-center justify-between gap-2">
+                                <div>
+                                    <span class="text-gray-500">聯絡電話 (Phone)：</span><br>
+                                    <span class="font-bold text-sm font-mono">0666310008</span>
+                                </div>
+                                <button type="button" onclick="copyText('0666310008')" class="shrink-0 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium no-print">複製</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 電車交通 -->
+            <!-- 電車交通 (已更新為 Day 3 & Day 4 兩日周遊卡) -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-train-subway text-green-600"></i> 二、大阪交通怎麼搭？
                 </h2>
                 <div class="space-y-4 text-gray-700">
-                    <div class="bg-green-50 p-3.5 rounded-xl border border-green-200">
-                        <div class="font-bold text-green-800 mb-1">💳 Day 1 & Day 2：使用 Suica 或 ICOCA</div>
-                        <ul class="list-disc list-inside text-xs space-y-1">
-                            <li>前兩天隨搭隨扣。iPhone 用戶可在「錢包(Apple Pay)」加入 Suica 直接刷手機進站。</li>
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                        <div class="font-bold text-green-800 text-base mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-credit-card"></i> Day 1、Day 2、Day 5：使用 Suica 或 ICOCA
+                        </div>
+                        <ul class="list-disc list-inside text-xs space-y-1.5 leading-relaxed">
+                            <li><strong>第 1、2 天與第 5 天（最後一天）</strong>採「隨搭隨扣」方式搭車（包含南海電鐵往返關西機場、去勝尾寺的御堂筋線與公車等）。</li>
+                            <li><strong>iPhone 用戶超推：</strong>打開「錢包 (Apple Pay)」點「+」加入 <strong>Suica</strong> 或 <strong>ICOCA</strong>，不用買實體卡就能直接拿手機感應進站，隨時用信用卡儲值！</li>
+                            <li><strong>Android / 實體卡：</strong>於關西機場或地鐵站售票機購買實體 ICOCA 卡儲值使用。</li>
                         </ul>
                     </div>
-                    <div class="bg-orange-50 p-3.5 rounded-xl border border-orange-200">
-                        <div class="font-bold text-orange-800 mb-1">🎟️ Day 3、4、5：使用「大阪周遊卡」</div>
-                        <ul class="list-disc list-inside text-xs space-y-1">
-                            <li>這三天搭乘大阪市營地下鐵全部免費。</li>
-                            <li>行程裡的<strong class="text-orange-700">大阪城、梅田空中庭園(15:00前)、通天閣、摩天輪</strong>，刷這張卡直接進去，連門票都不用買！</li>
+
+                    <div class="bg-orange-50 p-4 rounded-xl border border-orange-200">
+                        <div class="font-bold text-orange-800 text-base mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-ticket"></i> Day 3 & Day 4（2日券）：使用「大阪周遊卡」
+                        </div>
+                        <ul class="list-disc list-inside text-xs space-y-1.5 leading-relaxed">
+                            <li>我們把所有門票最貴的經典景點全部集中在 <strong>Day 3（週一）與 Day 4（週二）這兩天</strong>！</li>
+                            <li><strong>交通無限搭：</strong>這兩天搭乘 Osaka Metro（大阪市營地下鐵全線）與市營巴士全部<strong>免費無限次搭乘</strong>。</li>
+                            <li><strong>免費入場景點：</strong>直接出示周遊卡 QR Code 即可免費入場，不用另外買門票：
+                                <div id="pass-attractions-summary" class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div class="bg-white/90 p-2.5 rounded-lg border border-orange-200">
+                                        <div class="font-bold text-orange-900 mb-1">📅 Day 3 (10/19 一) 適用景點</div>
+                                        <div class="text-[11px] text-gray-700 leading-relaxed" id="pass-day3-list">大阪城天守閣、大阪城御座船、天保山大摩天輪、聖瑪麗亞號觀光船、梅田藍天大廈空中庭園（15:00前）、絹谷幸二天空美術館、大阪生活今昔館</div>
+                                    </div>
+                                    <div class="bg-white/90 p-2.5 rounded-lg border border-orange-200">
+                                        <div class="font-bold text-orange-900 mb-1">📅 Day 4 (10/20 二) 適用景點</div>
+                                        <div class="text-[11px] text-gray-700 leading-relaxed" id="pass-day4-list">四天王寺、天王寺動物園、通天閣展望台＋TOWER SLIDER、道頓堀觀光遊船</div>
+                                    </div>
+                                </div>
+                            </li>
                         </ul>
+                        <div class="mt-3 pt-2.5 border-t border-orange-200/80 text-xs text-orange-900 space-y-1">
+                            <div>🚨 <strong>梅田藍天大廈空中庭園：</strong>周遊卡免費入場限 <strong>15:00 前</strong>，逾時需自費。</div>
+                            <div>🚨 <strong>道頓堀觀光遊船：</strong>無法網路預約，Day 4 抵達後請<strong>先至現場售票處出示周遊卡換領指定時段船票</strong>。</div>
+                            <div>🚨 <strong>週二休館提醒：</strong>生活今昔館與天空美術館每週二休館（已排在 Day 3 週一，完美避開！）。</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -253,8 +367,8 @@
                 </h2>
                 <div class="space-y-3 text-gray-700">
                     <ul class="list-disc list-inside space-y-2 ml-1 text-sm">
-                        <li><strong>免稅門檻：</strong>同一家貼有「Tax-Free」的店買滿 <strong>5000 日圓</strong> (不含稅)。</li>
-                        <li><strong>結帳方式：</strong>出示<strong>「護照正本」</strong>，直接付免稅後的價格。</li>
+                        <li><strong>免稅門檻：</strong>同一天在同一家貼有「Tax-Free」的商店買滿 <strong>5,000 日圓</strong>（未稅）。</li>
+                        <li><strong>結帳方式：</strong>出示<strong>「護照正本」</strong>，直接以免稅後的價格結帳（2026年11月才改新制，我們10月去一樣現場直接免稅！）。</li>
                     </ul>
                     <div class="bg-red-50 p-3 rounded-lg border border-red-200 mt-2 text-xs">
                         <strong class="text-red-700">⚠️ 藥妝零食大禁忌 (消耗品)：</strong><br>
@@ -278,21 +392,30 @@
 
     <script>
         let currentActiveTab = 'overview';
-        const CACHE_KEY = 'osaka_itinerary_csv_cache_v3';
+        const CACHE_KEY = 'osaka_itinerary_csv_cache_v4';
 
-        // 對應天數的日期資訊
-        const DAY_DATES = {
-            1: '10/17 (六)',
-            2: '10/18 (日)',
-            3: '10/19 (一)',
-            4: '10/20 (二)',
-            5: '10/21 (三)'
+        // 對應天數的日期與交通票券配置（Day 3、4 使用大阪周遊卡，Day 1、2、5 使用 Suica/ICOCA）
+        const DAY_META = {
+            1: { date: '10/17 (六)', transport: '💳 Suica / ICOCA 隨搭隨扣', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' },
+            2: { date: '10/18 (日)', transport: '💳 Suica / ICOCA 隨搭隨扣', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' },
+            3: { date: '10/19 (一)', transport: '🎟️ 大阪周遊卡 (Day 1)', isPassDay: true, badgeClass: 'bg-orange-100 text-orange-800 border-orange-300' },
+            4: { date: '10/20 (二)', transport: '🎟️ 大阪周遊卡 (Day 2)', isPassDay: true, badgeClass: 'bg-orange-100 text-orange-800 border-orange-300' },
+            5: { date: '10/21 (三)', transport: '💳 Suica / ICOCA ＋ 南海電鐵', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' }
         };
+
+        // 大阪周遊卡適用景點關鍵字（用於自動標記 Day 3 & Day 4 免費入場設施與動態更新新手指南）
+        const PASS_KEYWORDS = [
+            '大阪城', '天守閣', '御座船', '天保山', '摩天輪', '聖瑪麗亞號',
+            '藍天大廈', '空中庭園', '天空美術館', '絹谷幸二', '生活今昔館', '今昔館',
+            '四天王寺', '天王寺動物園', '通天閣', 'TOWER SLIDER', 'Dive & Walk',
+            '道頓堀觀光遊船', '道頓堀遊船', '水上觀光船', 'HEP FIVE'
+        ];
 
         // 內建大阪行程專屬精準地名庫（自動掃描標題與詳細說明，支援單筆行程多個景點獨立導航）
         const KNOWN_PLACES = [
             { label: '桃園機場 T1', keywords: ['桃園機場', '桃園國際機場'], query: '桃園國際機場第一航廈' },
             { label: '關西機場 T1', keywords: ['關西機場', '關西國際機場'], query: '関西国際空港 第1ターミナル' },
+            { label: '天下茶屋站', keywords: ['天下茶屋站', '天下茶屋'], query: '天下茶屋駅 大阪' },
             { label: '嵐飯店 日本橋', keywords: ['Check-in', '飯店入住', 'Hotel Arashi', '嵐 Hotel'], query: 'Hotel Arashi Nippombashi 2 No.008 大阪市浪速区日本橋5-6-19' },
             { label: '大阪王將 惠美須町', keywords: ['大阪王將'], query: '大阪王将 恵美須町店' },
             { label: '拉麵なにわ新風', keywords: ['なにわ新風'], query: 'ラーメン なにわ新風 恵美須町店' },
@@ -302,18 +425,20 @@
             { label: 'WANAKA 章魚燒', keywords: ['WANAKA', 'わなか'], query: 'たこ焼道楽 わなか 天満店' },
             { label: '新世界本通商店街', keywords: ['新世界本通'], query: '新世界本通商店街 大阪' },
             { label: 'kankan 章魚燒', keywords: ['kankan', 'かんかん'], query: 'たこ焼き かんかん 新世界' },
+            { label: '箕面萱野站', keywords: ['箕面萱野站', '箕面萱野'], query: '箕面萱野駅' },
             { label: '勝尾寺', keywords: ['勝尾寺'], query: '勝尾寺 大阪府箕面市' },
             { label: 'KYK 豬排 (阪急32番街)', keywords: ['KYK', '阪急 32', '阪急32'], query: 'とんかつKYK 阪急32番街店' },
             { label: 'hololive 梅田店', keywords: ['hololive', '阪急三番街'], query: '阪急三番街 北館 大阪梅田' },
             { label: 'YONEX 梅田展售店', keywords: ['YONEX OSAKA', 'GRAND FRONT', 'YONEX展售店'], query: 'YONEX OSAKA SHOWROOM グランフロント大阪' },
             { label: '新梅田食道街 (HANAKO)', keywords: ['新梅田食道街', 'HANAKO'], query: '新梅田食道街' },
-            { label: '露天神社 (お初天神)', keywords: ['露天神社'], query: '露天神社 お初天神 大阪' },
+            { label: '露天神社 (お初天神)', keywords: ['露天神社', 'お初天神'], query: '露天神社 お初天神 大阪' },
             { label: '心齋橋筋商店街', keywords: ['心齋橋筋商店街'], query: '心斎橋筋商店街' },
             { label: 'Apple 心齋橋', keywords: ['Apple 心齋橋', 'Apple心齋橋'], query: 'Apple 心斎橋' },
+            { label: '麥當勞 心齋橋南店', keywords: ['麥當勞'], query: 'マクドナルド 心斎橋南店' },
             { label: 'Bic Camera 難波店', keywords: ['Bic Camera'], query: 'ビックカメラ なんば店' },
             { label: 'Round One 千日前', keywords: ['Round One', 'Round1'], query: 'ラウンドワンスタジアム 千日前店' },
             { label: '國產牛燒肉 あぶりや', keywords: ['あぶりや', '国産牛燒肉', '國產牛燒肉'], query: '国産牛焼肉食べ放題 あぶりや 千日前店' },
-            { label: '大阪城天守閣', keywords: ['大阪城公園', '大阪城天守閣', '參觀大阪城'], query: '大阪城天守閣' },
+            { label: '大阪城天守閣', keywords: ['大阪城公園', '大阪城天守閣', '參觀大阪城', '大阪城'], query: '大阪城天守閣' },
             { label: '大阪城御座船', keywords: ['御座船'], query: '大阪城御座船 乗船場' },
             { label: '天保山大摩天輪', keywords: ['天保山', '摩天輪'], query: '天保山大観覧車 大阪港' },
             { label: '聖瑪麗亞號觀光船', keywords: ['聖瑪麗亞號'], query: '帆船型観光船 サンタマリア のりば' },
@@ -328,10 +453,41 @@
             { label: '燒肉力丸 難波湊町店', keywords: ['燒肉力丸', '焼肉力丸', '湊町'], query: '焼肉力丸 なんば湊町店' },
             { label: 'Fandom Namba 動漫店', keywords: ['Fandom'], query: 'Fandom Namba 大阪日本橋' },
             { label: 'Animate 大阪日本橋', keywords: ['Animate', '安利美特'], query: 'アニメイト大阪日本橋' },
+            { label: 'Yonex 羽球店', keywords: ['羽毛球專賣店', 'Yonex羽毛球', '尤尼克斯'], query: 'バドミントン プロショップ 大阪難波' },
             { label: '難波八坂神社', keywords: ['難波八坂神社', '八坂神社', '八阪神社'], query: '難波八阪神社' },
             { label: '今宮戎神社', keywords: ['今宮戎神社'], query: '今宮戎神社 大阪' },
-            { label: '玉出超市 日本橋店', keywords: ['玉出超市', '超市最後補貨'], query: 'スーパー玉出 日本橋店' }
+            { label: '玉出超市 日本橋店', keywords: ['玉出超市', '超市最後補貨'], query: 'スーパー玉出 日本橋店' },
+            { label: 'LIFE 超市', keywords: ['LIFE'], query: 'ライフ なんば店' },
+            { label: 'AEON 超市', keywords: ['AEON'], query: 'マックスバリュ 難波' }
         ];
+
+        // 複製文字到剪貼簿
+        function copyText(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => showCopyToast(`已複製：${text}`));
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showCopyToast(`已複製：${text}`);
+            }
+        }
+
+        function showCopyToast(msg) {
+            const toast = document.getElementById('copy-toast');
+            const toastText = document.getElementById('copy-toast-text');
+            if (!toast || !toastText) return;
+            toastText.innerText = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 1800);
+        }
 
         // 切換分頁邏輯
         function switchTab(tabId) {
@@ -376,11 +532,17 @@
             const str = rawDay.trim();
             if (!str) return null;
 
-            // 支援格式: "Day 1", "Day1", "D1", "第1天", "Day 1 (10/17)", 或純數字 "1"~"9"
-            const matchNum = str.match(/^(?:day\s*|d\s*|第\s*)?([1-9]\d?)\s*(?:天|日)?(?:\s*[\(（].*[\)）])?$/i);
-            if (matchNum) {
-                const num = parseInt(matchNum[1], 10);
-                return { num: num, label: `Day ${num}` };
+            // 支援格式: "Day 1", "Day1", "D1", "第1天", "Day 3 (周遊卡)", 或純數字 "1"~"9"
+            const matchPrefix = str.match(/^(?:day\s*|d\s*|第\s*)([1-9])\b/i);
+            if (matchPrefix) {
+                const num = parseInt(matchPrefix[1], 10);
+                return { num: num, label: `Day ${num}`, rawNote: str };
+            }
+
+            const matchPureNum = str.match(/^([1-9])(?:\s*$|\s*[\(（天日])/);
+            if (matchPureNum) {
+                const num = parseInt(matchPureNum[1], 10);
+                return { num: num, label: `Day ${num}`, rawNote: str };
             }
 
             // 支援中文天數: "第一天" ~ "第七天"
@@ -388,19 +550,30 @@
             const matchCn = str.match(/^第([一二三四五六七])天/);
             if (matchCn && cnNums[matchCn[1]]) {
                 const num = cnNums[matchCn[1]];
-                return { num: num, label: `Day ${num}` };
+                return { num: num, label: `Day ${num}`, rawNote: str };
             }
 
             // 支援直接填日期: "10/17" ~ "10/21"
             const dateMap = { '10/17': 1, '10/18': 2, '10/19': 3, '10/20': 4, '10/21': 5 };
             for (const [dateKey, dNum] of Object.entries(dateMap)) {
                 if (str.startsWith(dateKey)) {
-                    return { num: dNum, label: `Day ${dNum}` };
+                    return { num: dNum, label: `Day ${dNum}`, rawNote: str };
                 }
             }
 
             // 左邊未排天數或非天數格式的一律忽略不顯示
             return null;
+        }
+
+        // 判斷該筆行程是否為大阪周遊卡免費/適用設施（限 Day 3 & Day 4 或明確標註周遊卡者）
+        function isOsakaPassAttraction(dayNum, item) {
+            const combined = `${item.rawDayNote || ''} ${item.title} ${item.detail} ${item.category}`;
+            if (/周遊券|周遊卡/.test(combined)) return true;
+            const meta = DAY_META[dayNum];
+            if (meta && meta.isPassDay) {
+                return PASS_KEYWORDS.some(kw => combined.includes(kw));
+            }
+            return false;
         }
 
         // 將時間字串轉為分鐘數以便排序
@@ -429,7 +602,7 @@
                 if (parts.length > 0) {
                     return parts.map(p => ({
                         label: p,
-                        url: toGoogleMapsUrl(p.includes('桃園') || p.includes('大阪') ? p : `${p} 大阪`)
+                        url: toGoogleMapsUrl(p.includes('桃園') || p.includes('大阪') || p.includes('空港') ? p : `${p} 大阪`)
                     }));
                 }
             }
@@ -442,8 +615,10 @@
             // 3. 掃描標題與詳細說明，比對內建大阪精準地名庫（可同時匹配同一筆行程內的多個景點）
             const combinedText = `${item.title} ${item.detail}`;
             const matchedPlaces = [];
+            const seenLabels = new Set();
             for (const entry of KNOWN_PLACES) {
-                if (entry.keywords.some(kw => combinedText.includes(kw))) {
+                if (entry.keywords.some(kw => combinedText.includes(kw)) && !seenLabels.has(entry.label)) {
+                    seenLabels.add(entry.label);
                     matchedPlaces.push({
                         label: entry.label,
                         url: toGoogleMapsUrl(entry.query)
@@ -472,7 +647,7 @@
             }];
         }
 
-        // 將文字中的網址自動轉為超連結並處理換行
+        // 將文字中的網址自動轉為超連結並高亮關鍵提醒字眼
         function formatDetailText(text) {
             if (!text) return '';
             const escaped = text
@@ -483,7 +658,67 @@
                 /(https?:\/\/[^\s<]+)/g,
                 '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline break-all hover:text-blue-800"><i class="fa-solid fa-arrow-up-right-from-square text-[10px] mr-0.5"></i>開啟連結</a>'
             );
-            return linked.replace(/\n/g, '<br>');
+            // 高亮重要時限提醒（如 15:00前、18:00前、換領等）
+            const highlighted = linked.replace(
+                /(15:00\s*前|18:00\s*前|04:30\s*前|免費入場|先至現場換領[^，。]*)/g,
+                '<strong class="text-red-700 bg-red-50 px-1 rounded">$1</strong>'
+            );
+            return highlighted.replace(/\n/g, '<br>');
+        }
+
+        // 動態更新首頁 5日總覽 與 新手指南中的周遊卡景點清單
+        function updateDynamicSummaries(sortedDays) {
+            // 1. 更新新手指南中 Day 3 & Day 4 的周遊卡景點列表
+            const day3PassEl = document.getElementById('pass-day3-list');
+            const day4PassEl = document.getElementById('pass-day4-list');
+
+            sortedDays.forEach(([dayNum, dayObj]) => {
+                const passTitles = dayObj.items
+                    .filter(it => isOsakaPassAttraction(dayNum, it))
+                    .map(it => it.title.replace(/^(上午|中午|下午|傍晚|前往)\s*[:：]?\s*/g, ''));
+
+                if (dayNum === 3 && day3PassEl && passTitles.length > 0) {
+                    day3PassEl.innerText = passTitles.join('、');
+                }
+                if (dayNum === 4 && day4PassEl && passTitles.length > 0) {
+                    day4PassEl.innerText = passTitles.join('、');
+                }
+            });
+
+            // 2. 更新首頁「5 日交通票券與行程配置」摘要
+            const overviewSummaryEl = document.getElementById('overview-days-summary');
+            if (overviewSummaryEl && sortedDays.length > 0) {
+                overviewSummaryEl.innerHTML = sortedDays.map(([dayNum, dayObj]) => {
+                    const meta = DAY_META[dayNum] || {
+                        date: '',
+                        transport: '💳 Suica / ICOCA',
+                        isPassDay: false,
+                        badgeClass: 'bg-green-100 text-green-800 border-green-200'
+                    };
+                    const highlights = dayObj.items
+                        .filter(it => !/報到|退房|Check-in|Check-out|起飛/i.test(it.title))
+                        .slice(0, 4)
+                        .map(it => it.title.replace(/^(早餐|午餐|晚餐|出發前往|前往)\s*[:：]?\s*/g, ''))
+                        .join(' ➔ ');
+
+                    const rowBg = meta.isPassDay ? 'bg-orange-50/70 border-orange-200 hover:bg-orange-100/60' : 'bg-gray-50 border-gray-200 hover:bg-gray-100';
+
+                    return `
+                    <div onclick="switchTab('day${dayNum}')" class="cursor-pointer transition flex items-center justify-between gap-2 p-3 rounded-xl border ${rowBg}">
+                        <div class="min-w-0">
+                            <div class="font-bold text-gray-900 flex items-center gap-1.5">
+                                <span>${dayObj.label}${meta.date ? ` · ${meta.date}` : ''}</span>
+                                <span class="text-[11px] text-gray-400 font-normal">(${dayObj.items.length} 個行程)</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-0.5 truncate">${highlights || '點擊查看當日完整行程'}</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full border ${meta.badgeClass}">
+                            ${meta.isPassDay ? `🎟️ 大阪周遊卡 D${dayNum - 2}` : '💳 Suica / ICOCA'}
+                        </span>
+                    </div>
+                    `;
+                }).join('');
+            }
         }
 
         // 渲染試算表資料至畫面
@@ -511,6 +746,7 @@
                     time: timeStr,
                     timeMinutes: parseTimeMinutes(timeStr),
                     originalIdx: originalIdx,
+                    rawDayNote: parsedDay.rawNote,
                     title: title,
                     detail: row[3] ? row[3].trim() : '',
                     category: row[4] ? row[4].trim() : '',
@@ -520,6 +756,9 @@
 
             // 依天數由小到大排序 (Day 1 -> Day 5)
             const sortedDays = Array.from(daysMap.entries()).sort((a, b) => a[0] - b[0]);
+
+            // 同步更新首頁與新手指南的動態摘要
+            updateDynamicSummaries(sortedDays);
 
             const navContainer = document.getElementById('main-nav');
             const sectionsContainer = document.getElementById('dynamic-sections-container');
@@ -532,7 +771,13 @@
             sortedDays.forEach(([dayNum, dayObj]) => {
                 const tabId = 'day' + dayNum;
                 const dayName = dayObj.label;
-                const dateSubtitle = DAY_DATES[dayNum] ? ` · ${DAY_DATES[dayNum]}` : '';
+                const meta = DAY_META[dayNum] || {
+                    date: '',
+                    transport: '💳 Suica / ICOCA',
+                    isPassDay: false,
+                    badgeClass: 'bg-green-100 text-green-800 border-green-200'
+                };
+                const dateSubtitle = meta.date ? ` · ${meta.date}` : '';
 
                 // 同一天內依時間自動排序，若無填時間則保持試算表順序
                 const items = dayObj.items.sort((a, b) => {
@@ -550,7 +795,7 @@
                 btn.onclick = () => switchTab(tabId);
                 navContainer.appendChild(btn);
 
-                // 2. 生成行程區塊 HTML（RWD 完美對齊設計：時間與分類標籤固定於頂部左側、導航固定於頂部右側、標題獨立一行）
+                // 2. 生成行程區塊 HTML
                 const section = document.createElement('section');
                 section.id = 'tab-' + tabId;
                 section.className = 'tab-content hidden print-page space-y-4';
@@ -569,11 +814,16 @@
                         badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border ${badgeColor}">${item.category}</span>`;
                     }
 
+                    // 檢查是否為 Day 3 / Day 4 大阪周遊卡適用景點
+                    const passBadgeHtml = isOsakaPassAttraction(dayNum, item)
+                        ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300"><i class="fa-solid fa-ticket text-[10px]"></i>周遊卡免費</span>`
+                        : '';
+
                     const timeHtml = item.time
                         ? `<span class="inline-flex items-center text-red-800 bg-red-50 px-2 py-0.5 rounded-md border border-red-100 text-xs font-mono font-bold tracking-wide">${item.time}</span>`
                         : '';
 
-                    // 解析導航連結（單一地點顯示右上角導航按鈕；多地點額外在底部顯示分點導航小標籤）
+                    // 解析導航連結
                     const navLinks = resolveNavLinks(item);
                     const primaryNav = navLinks.length > 0 ? navLinks[0] : null;
                     const navButtonHtml = primaryNav
@@ -592,24 +842,25 @@
                            </div>`
                         : '';
 
-                    const hasTopBar = timeHtml || badgeHtml || navButtonHtml;
+                    const hasTopBar = timeHtml || badgeHtml || passBadgeHtml || navButtonHtml;
 
                     return `
                     <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2 mt-4 hover:border-red-200 transition-colors">
                         <!-- 時間軸紅點 -->
                         <div class="absolute -left-[30px] top-4 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
                         
-                        <!-- 第一排：左側 [時間 + 分類標籤] 固定同行，右側 [導航按鈕] 絕不跑版 -->
+                        <!-- 第一排：左側 [時間 + 分類標籤 + 周遊卡標籤] 固定同行，右側 [導航按鈕] 絕不跑版 -->
                         ${hasTopBar ? `
                         <div class="flex items-center justify-between gap-2 mb-1.5">
                             <div class="flex flex-wrap items-center gap-1.5">
                                 ${timeHtml}
                                 ${badgeHtml}
+                                ${passBadgeHtml}
                             </div>
                             ${navButtonHtml}
                         </div>` : ''}
 
-                        <!-- 第二排：行程標題獨立完整一行，任何螢幕寬度都不會被擠壓 -->
+                        <!-- 第二排：行程標題獨立完整一行 -->
                         <div class="font-bold text-gray-900 text-[15px] sm:text-base leading-snug break-words">
                             ${item.title}
                         </div>
@@ -625,13 +876,20 @@
 
                 section.innerHTML = `
                 <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-3 mb-5">
-                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
-                            <i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName}${dateSubtitle}
-                        </h2>
-                        <span class="text-xs font-bold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200 shadow-sm shrink-0">
-                            共 ${items.length} 個行程
-                        </span>
+                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-gray-300 pb-3 mb-4">
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
+                                <i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName}${dateSubtitle}
+                            </h2>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full border shadow-sm ${meta.badgeClass}">
+                                ${meta.transport}
+                            </span>
+                            <span class="text-xs font-bold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200 shadow-sm shrink-0">
+                                共 ${items.length} 個行程
+                            </span>
+                        </div>
                     </div>
                     <div class="relative border-l-[3px] border-red-200 ml-2 pl-3">
                         ${timelineHtml}
@@ -690,6 +948,27 @@
             }
         }
 
+        // 更新行李檢查表進度顯示
+        function updateChecklistProgress() {
+            const checkboxes = document.querySelectorAll('.check-item');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const progressEl = document.getElementById('checklist-progress');
+            if (progressEl) {
+                progressEl.innerText = `進度 ${checkedCount}/${checkboxes.length}`;
+            }
+        }
+
+        // 重置行李檢查表
+        function resetChecklist() {
+            const checkboxes = document.querySelectorAll('.check-item');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                const key = 'osaka_check_' + cb.getAttribute('data-check');
+                localStorage.setItem(key, 'false');
+            });
+            updateChecklistProgress();
+        }
+
         // 行李檢查表勾選記憶功能
         function initChecklistStorage() {
             const checkboxes = document.querySelectorAll('.check-item');
@@ -700,8 +979,10 @@
                 }
                 cb.addEventListener('change', () => {
                     localStorage.setItem(key, cb.checked ? 'true' : 'false');
+                    updateChecklistProgress();
                 });
             });
+            updateChecklistProgress();
         }
 
         // 監聽滾動事件：顯示「返回頂部」按鈕
