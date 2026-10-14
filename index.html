@@ -598,6 +598,8 @@
             { label: '桃園機場 T1', keywords: ['桃園機場', '桃園國際機場'], query: '桃園國際機場第一航廈' },
             { label: '關西機場 T1', keywords: ['關西機場', '關西國際機場'], query: '関西国際空港 第1ターミナル' },
             { label: '天下茶屋站', keywords: ['天下茶屋站', '天下茶屋'], query: '天下茶屋駅 大阪' },
+            { label: '動物園前站', keywords: ['動物園前站', '動物園前'], query: '動物園前駅 大阪' },
+            { label: '惠美須町站', keywords: ['惠美須町站', '恵美須町'], query: '恵美須町駅 大阪' },
             { label: '嵐飯店 日本橋', keywords: ['Check-in', '飯店入住', 'Hotel Arashi', '嵐 Hotel'], query: 'Hotel Arashi Nippombashi 2 No.008 大阪市浪速区日本橋5-6-19' },
             { label: '大阪王將 惠美須町', keywords: ['大阪王將'], query: '大阪王将 恵美須町店' },
             { label: '拉麵なにわ新風', keywords: ['なにわ新風'], query: 'ラーメン なにわ新風 恵美須町店' },
@@ -757,7 +759,7 @@
             }, 1800);
         }
 
-        // 切換分頁邏輯
+        // 切換分頁邏輯（保留動態屬性並自動將選中頁籤捲動至導覽列中央）
         function switchTab(tabId) {
             currentActiveTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -770,6 +772,9 @@
             const activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) {
                 activeBtn.className = 'tab-btn flex-1 py-2 px-3 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm';
+                try {
+                    activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } catch (e) {}
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -856,7 +861,7 @@
             return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryStr)}`;
         }
 
-        // 智慧型導航解析器
+        // 智慧型導航解析器（支援擷取【起站⇄迄站】與內建地名庫）
         function resolveNavLinks(item) {
             if (item.location) {
                 const parts = item.location.split(/[、,，/]/).map(s => s.trim()).filter(Boolean);
@@ -875,6 +880,22 @@
             const combinedText = `${item.title} ${item.detail}`;
             const matchedPlaces = [];
             const seenLabels = new Set();
+
+            // 優先解析詳細說明中的【起點⇄終點】乘車區間站名
+            const routeBracketMatch = item.detail ? item.detail.match(/【([^】]+)】/) : null;
+            if (routeBracketMatch && /[⇄➔→↔]/.test(routeBracketMatch[1])) {
+                const stations = routeBracketMatch[1].split(/[⇄➔→↔]/).map(s => s.trim()).filter(Boolean);
+                stations.forEach(st => {
+                    const known = KNOWN_PLACES.find(k => k.keywords.some(kw => kw.includes(st) || st.includes(kw)));
+                    const label = known ? known.label : (st.endsWith('站') || st.endsWith('寺') ? st : `${st}站`);
+                    const query = known ? known.query : `${st}駅 大阪`;
+                    if (!seenLabels.has(label)) {
+                        seenLabels.add(label);
+                        matchedPlaces.push({ label, url: toGoogleMapsUrl(query) });
+                    }
+                });
+            }
+
             for (const entry of KNOWN_PLACES) {
                 if (entry.keywords.some(kw => combinedText.includes(kw)) && !seenLabels.has(entry.label)) {
                     seenLabels.add(entry.label);
@@ -905,7 +926,7 @@
             }];
         }
 
-        // 將文字中的網址、時限提醒與「大阪地鐵路線代表色」自動美化
+        // 將文字中的網址、時限提醒、月台站牌、車資金額與地鐵代表色自動美化
         function formatDetailText(text) {
             if (!text) return '';
             const escaped = text
@@ -921,15 +942,53 @@
                 /(15:00\s*前|18:00\s*前|04:30\s*前|免費入場|先至現場換領[^，。]*)/g,
                 '<strong class="text-red-700 bg-red-50 px-1 rounded">$1</strong>'
             );
-            // 自動為大阪地鐵路線加上官方代表色膠囊標籤
+            // 自動美化連寫的日圓與台幣金額（例如：¥530NT$110 轉為精緻金額標籤）
+            formatted = formatted.replace(
+                /[¥￥]\s*([\d,]+)\s*(?:NT\$\s*([\d,]+))?/gi,
+                (match, jpy, twd) => {
+                    if (twd) {
+                        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mx-0.5">¥${jpy} <span class="text-amber-700 font-normal">(約NT$${twd})</span></span>`;
+                    }
+                    return `<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mx-0.5">¥${jpy}</span>`;
+                }
+            );
+            // 高亮月台、站牌與出口資訊
+            formatted = formatted.replace(
+                /(\d+\s*號月[臺台]|\d+\s*號站牌|[東西南北中央]+剪票口(?:出站)?|\d+(?:-[A-Z0-9]+)?\s*號出口)/g,
+                '<span class="inline-block bg-blue-50 text-blue-800 border border-blue-200 px-1.5 py-0.2 rounded text-[11px] font-bold mx-0.5">$1</span>'
+            );
+            // 自動為大阪地鐵路線與巴士加上官方代表色膠囊標籤
             formatted = formatted
-                .replace(/堺筋線\s*(?:\(K線\))?|K線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-amber-800 text-white mx-0.5">堺筋線 K</span>')
-                .replace(/御堂筋線\s*(?:\(M線\))?|M線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-red-600 text-white mx-0.5">御堂筋線 M</span>')
-                .replace(/中央線\s*(?:\(C線\))?|C線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-emerald-600 text-white mx-0.5">中央線 C</span>')
-                .replace(/谷町線\s*(?:\(T線\))?|T線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-purple-700 text-white mx-0.5">谷町線 T</span>')
-                .replace(/南海機場線|南海電鐵/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-blue-700 text-white mx-0.5">南海電鐵</span>');
+                .replace(/「?\s*堺筋線\s*(?:\(K線\)|K)?\s*」?|K線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-amber-800 text-white mx-0.5">堺筋線 K</span>')
+                .replace(/「?\s*御堂筋線\s*(?:\(M線\)|M)?\s*」?|M線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-red-600 text-white mx-0.5">御堂筋線 M</span>')
+                .replace(/「?\s*中央線\s*(?:\(C線\)|C)?\s*」?|C線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-emerald-600 text-white mx-0.5">中央線 C</span>')
+                .replace(/「?\s*谷町線\s*(?:\(T線\)|T)?\s*」?|T線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-purple-700 text-white mx-0.5">谷町線 T</span>')
+                .replace(/「?\s*四橋線\s*(?:\(Y線\)|Y)?\s*」?|Y線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-sky-600 text-white mx-0.5">四橋線 Y</span>')
+                .replace(/「?\s*千日前線\s*(?:\(S線\)|S)?\s*」?|S線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-pink-500 text-white mx-0.5">千日前線 S</span>')
+                .replace(/南海機場線|南海電鐵/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-blue-700 text-white mx-0.5">南海電鐵</span>')
+                .replace(/「?\s*(阪急巴士[^」\s]*)\s*」?/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-teal-700 text-white mx-0.5">🚌 $1</span>');
 
             return formatted.replace(/\n/g, '<br>');
+        }
+
+        // 計算單日行程中標註的預估車資/門票總計
+        function calculateDayAnnotatedCost(items) {
+            let totalJpy = 0;
+            let totalTwd = 0;
+            items.forEach(it => {
+                const text = `${it.title} ${it.detail}`;
+                const regex = /[¥￥]\s*([\d,]+)\s*(?:NT\$\s*([\d,]+))?/gi;
+                let match;
+                while ((match = regex.exec(text)) !== null) {
+                    const jpyVal = parseInt(match[1].replace(/,/g, ''), 10);
+                    if (!isNaN(jpyVal)) totalJpy += jpyVal;
+                    if (match[2]) {
+                        const twdVal = parseInt(match[2].replace(/,/g, ''), 10);
+                        if (!isNaN(twdVal)) totalTwd += twdVal;
+                    }
+                }
+            });
+            return { totalJpy, totalTwd };
         }
 
         // 動態更新首頁 5日總覽 與 新手指南中的周遊卡景點清單
@@ -1026,10 +1085,11 @@
             const loader = document.getElementById('loading-indicator');
             if (loader) loader.remove();
 
-            navContainer.querySelectorAll('.dynamic-day-btn').forEach(el => el.remove());
+            // 徹底清除舊的動態天數按鈕（避免 switchTab 覆蓋 class 後造成重複產生 Day 1~5）
+            navContainer.querySelectorAll('[data-dynamic-day="true"], [id^="btn-day"]').forEach(el => el.remove());
             sectionsContainer.innerHTML = '';
 
-            sortedDays.forEach(([dayNum, dayObj]) => {
+            sortedDays.forEach(([dayNum, dayObj], idx) => {
                 const tabId = 'day' + dayNum;
                 const dayName = dayObj.label;
                 const meta = DAY_META[dayNum] || {
@@ -1047,10 +1107,11 @@
                     return a.originalIdx - b.originalIdx;
                 });
 
-                // 1. 生成上方導覽按鈕
+                // 1. 生成上方導覽按鈕（使用 data-dynamic-day 標記，確保重新渲染時不會重複）
                 const btn = document.createElement('button');
-                btn.className = 'tab-btn dynamic-day-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
+                btn.className = 'tab-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
                 btn.id = 'btn-' + tabId;
+                btn.setAttribute('data-dynamic-day', 'true');
                 btn.innerText = dayName;
                 btn.onclick = () => switchTab(tabId);
                 navContainer.appendChild(btn);
@@ -1059,6 +1120,13 @@
                 const section = document.createElement('section');
                 section.id = 'tab-' + tabId;
                 section.className = 'tab-content hidden print-page space-y-4';
+
+                const { totalJpy, totalTwd } = calculateDayAnnotatedCost(items);
+                const costBadgeHtml = totalJpy > 0
+                    ? `<span class="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 shadow-sm shrink-0">
+                        💴 當日標註花費 ¥${totalJpy.toLocaleString()}${totalTwd > 0 ? ` (約NT$${totalTwd.toLocaleString()})` : ''}
+                       </span>`
+                    : '';
 
                 let timelineHtml = items.map(item => {
                     let badgeHtml = '';
@@ -1126,6 +1194,30 @@
                     `;
                 }).join('');
 
+                // 底部快速切換前一天 / 下一天按鈕
+                const prevDay = idx > 0 ? sortedDays[idx - 1][0] : null;
+                const nextDay = idx < sortedDays.length - 1 ? sortedDays[idx + 1][0] : null;
+                const bottomNavHtml = `
+                <div class="mt-6 pt-3 border-t border-gray-200 flex items-center justify-between gap-2 no-print">
+                    ${prevDay
+                        ? `<button type="button" onclick="switchTab('day${prevDay}')" class="flex-1 py-2.5 px-3 bg-white hover:bg-gray-100 text-gray-700 font-bold text-xs rounded-xl border border-gray-200 shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+                            <i class="fa-solid fa-chevron-left text-red-800"></i> 前一天 (Day ${prevDay})
+                           </button>`
+                        : `<button type="button" onclick="switchTab('overview')" class="flex-1 py-2.5 px-3 bg-white hover:bg-gray-100 text-gray-700 font-bold text-xs rounded-xl border border-gray-200 shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+                            <i class="fa-solid fa-plane text-red-800"></i> 回航班與總覽
+                           </button>`
+                    }
+                    ${nextDay
+                        ? `<button type="button" onclick="switchTab('day${nextDay}')" class="flex-1 py-2.5 px-3 bg-red-800 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+                            下一天 (Day ${nextDay}) <i class="fa-solid fa-chevron-right"></i>
+                           </button>`
+                        : `<button type="button" onclick="switchTab('checklist')" class="flex-1 py-2.5 px-3 bg-red-800 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+                            回行李檢查表 <i class="fa-solid fa-clipboard-check"></i>
+                           </button>`
+                    }
+                </div>
+                `;
+
                 section.innerHTML = `
                 <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">
                     <div class="flex flex-wrap justify-between items-center gap-2 border-b border-gray-300 pb-3 mb-4">
@@ -1134,10 +1226,11 @@
                                 <i class="fa-regular fa-calendar-check text-red-800 mr-2"></i> ${dayName}${dateSubtitle}
                             </h2>
                         </div>
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex flex-wrap items-center gap-1.5">
                             <span class="text-xs font-bold px-2.5 py-1 rounded-full border shadow-sm ${meta.badgeClass}">
                                 ${meta.transport}
                             </span>
+                            ${costBadgeHtml}
                             <span class="text-xs font-bold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200 shadow-sm shrink-0">
                                 共 ${items.length} 個行程
                             </span>
@@ -1146,6 +1239,7 @@
                     <div class="relative border-l-[3px] border-red-200 ml-2 pl-3">
                         ${timelineHtml}
                     </div>
+                    ${bottomNavHtml}
                 </div>
                 `;
                 sectionsContainer.appendChild(section);
@@ -1175,6 +1269,14 @@
             const refreshIcon = document.getElementById('refreshIcon');
             if (isManualRefresh && refreshIcon) {
                 refreshIcon.classList.add('fa-spin');
+            }
+
+            // 首次開啟時若手機已有快取，先0秒瞬間渲染畫面，同時在背景同步最新試算表
+            if (!isManualRefresh) {
+                const cachedCSV = localStorage.getItem(CACHE_KEY);
+                if (cachedCSV) {
+                    try { renderScheduleFromCSV(cachedCSV, true); } catch (e) {}
+                }
             }
 
             try {
