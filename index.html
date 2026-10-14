@@ -2,7 +2,13 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#991b1b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="大阪自由行">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23991b1b'/><text x='50' y='68' font-size='54' text-anchor='middle' fill='white'>⛩️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23991b1b'/><text x='50' y='68' font-size='54' text-anchor='middle' fill='white'>⛩️</text></svg>">
     <title>大阪自由行隨身手冊 (共編同步版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -31,47 +37,60 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-gray-800 pb-14 relative">
+<body class="text-gray-800 pb-16 relative">
 
     <!-- 複製成功提示 Toast -->
-    <div id="copy-toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg z-50 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-1.5 no-print">
+    <div id="copy-toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg z-[60] opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-1.5 no-print">
         <i class="fa-solid fa-circle-check text-green-400"></i>
         <span id="copy-toast-text">已複製到剪貼簿！</span>
     </div>
 
     <!-- 頂部標題與工具列 -->
     <header class="bg-red-800 text-white shadow-md sticky top-0 z-50 no-print">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-torii-gate text-xl"></i>
-                <div>
-                    <h1 class="font-bold text-base sm:text-lg tracking-wide flex items-center gap-1.5">
-                        大阪自由行
-                        <span id="sync-badge" class="text-[11px] bg-red-600 px-1.5 py-0.5 rounded shadow-sm font-normal">同步中...</span>
+        <div class="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 flex justify-between items-center gap-2">
+            <div class="flex items-center space-x-2 min-w-0">
+                <i class="fa-solid fa-torii-gate text-lg sm:text-xl shrink-0"></i>
+                <div class="truncate">
+                    <h1 class="font-bold text-sm sm:text-lg tracking-wide flex items-center gap-1.5">
+                        <span class="truncate">大阪自由行</span>
+                        <span id="sync-badge" class="text-[10px] sm:text-[11px] bg-red-600 px-1.5 py-0.5 rounded shadow-sm font-normal shrink-0">同步中...</span>
                     </h1>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="refreshBtn" type="button" onclick="loadGoogleSheet(true)" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-2.5 py-2 rounded-lg border border-red-500 flex items-center gap-1 transition shadow-sm active:scale-95" title="重新同步試算表">
-                    <i id="refreshIcon" class="fa-solid fa-arrows-rotate"></i>
-                    <span class="hidden sm:inline">重新同步</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- 日圓與免稅計算機按鈕 -->
+                <button type="button" onclick="toggleCalcModal(true)" class="bg-amber-500 hover:bg-amber-400 text-gray-950 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition shadow-sm active:scale-95" title="日圓匯率與免稅換算">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>換算</span>
                 </button>
-                <button id="printBtn" type="button" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-3 py-2 rounded-lg border border-red-500 flex items-center gap-1.5 transition shadow-sm active:scale-95">
-                    <i class="fa-solid fa-print"></i> 儲存 PDF
+                <!-- 快速開啟共編試算表 -->
+                <a href="https://docs.google.com/spreadsheets/d/1qeVi1_ELdBqnZk-j_ReOMAIlEHrqspGoYJt40MbSNPg/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg border border-red-500 flex items-center gap-1 transition shadow-sm active:scale-95" title="打開 Google 試算表修改行程">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span class="hidden sm:inline">共編表單</span>
+                </a>
+                <!-- 重新同步按鈕 -->
+                <button id="refreshBtn" type="button" onclick="loadGoogleSheet(true)" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg border border-red-500 flex items-center gap-1 transition shadow-sm active:scale-95" title="重新同步試算表">
+                    <i id="refreshIcon" class="fa-solid fa-arrows-rotate"></i>
+                    <span class="hidden md:inline">同步</span>
+                </button>
+                <!-- 列印 / PDF -->
+                <button id="printBtn" type="button" class="bg-red-700 hover:bg-red-600 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg border border-red-500 flex items-center gap-1 transition shadow-sm active:scale-95" title="列印或儲存 PDF">
+                    <i class="fa-solid fa-print"></i>
+                    <span class="hidden md:inline">PDF</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 pt-4 main-container">
+    <main class="max-w-4xl mx-auto px-4 pt-3 main-container">
 
         <!-- 導覽切換選單 -->
-        <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-4 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200 sticky top-[60px] z-40" id="main-nav">
+        <nav class="bg-white rounded-xl p-1.5 shadow-sm mb-3 flex space-x-1 overflow-x-auto no-scrollbar no-print text-sm border border-gray-200 sticky top-[52px] z-40" id="main-nav">
             <!-- 固定頁籤 -->
-            <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">航班住宿</button>
-            <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
-            <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運規定</button>
-            <button onclick="switchTab('guide')" class="tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-guide">💡新手指南</button>
+            <button onclick="switchTab('overview')" class="tab-btn flex-1 py-2 px-3 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm" id="btn-overview">航班住宿</button>
+            <button onclick="switchTab('checklist')" class="tab-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-checklist">行李檢查</button>
+            <button onclick="switchTab('baggage')" class="tab-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-baggage">托運規定</button>
+            <button onclick="switchTab('guide')" class="tab-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800" id="btn-guide">💡新手指南</button>
             
             <!-- 動態生成的天數頁籤將會插入在這裡 -->
             <div id="loading-indicator" class="flex-1 py-2 px-3.5 text-center text-gray-400 text-xs font-bold flex items-center justify-center gap-2 whitespace-nowrap">
@@ -80,32 +99,35 @@
         </nav>
 
         <!-- 護照安全警告標語 -->
-        <div class="bg-amber-50 border-l-4 border-amber-500 p-3.5 mb-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start space-x-3">
-            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5 shrink-0"></i>
-            <div>
-                <span class="font-bold">重要安全提示：護照必須全程隨身攜帶，切勿離身！</span>
-                <p class="text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身帶護照備查；免稅也需出示正本（影本無效）。請勿放飯店或托運。</p>
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-3 mb-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start justify-between gap-2">
+            <div class="flex items-start space-x-2.5">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base mt-0.5 shrink-0"></i>
+                <div>
+                    <span class="font-bold text-xs sm:text-sm">重要提示：護照必須全程隨身攜帶，切勿離身！</span>
+                    <p class="text-[11px] sm:text-xs text-amber-800 mt-0.5">日本法律規定外國旅客須隨身帶護照備查；免稅也需出示正本（影本無效）。</p>
+                </div>
             </div>
+            <span id="trip-status-pill" class="shrink-0 text-[11px] font-bold bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full whitespace-nowrap no-print">10/17 出發</span>
         </div>
 
         <!-- === 1. 航班與住宿 === -->
         <section id="tab-overview" class="tab-content print-page space-y-4">
             <!-- 實用旅遊小知識面板 -->
-            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex justify-between items-center text-center shadow-sm">
-                <div class="flex-1 border-r border-blue-200">
-                    <i class="fa-solid fa-temperature-half text-blue-500 mb-1.5 text-xl block"></i>
-                    <div class="text-xs text-blue-900 font-bold">10月均溫</div>
-                    <div class="text-sm font-bold text-gray-800">15~23°C</div>
+            <div class="bg-blue-50 p-3.5 rounded-2xl border border-blue-100 flex justify-between items-center text-center shadow-sm">
+                <div class="flex-1 border-r border-blue-200 pr-1">
+                    <i class="fa-solid fa-temperature-half text-blue-500 mb-1 text-lg block"></i>
+                    <div class="text-[11px] text-blue-900 font-bold">10月均溫</div>
+                    <div class="text-xs sm:text-sm font-bold text-gray-800">15~23°C</div>
                 </div>
-                <div class="flex-1 border-r border-blue-200">
-                    <i class="fa-solid fa-ticket text-blue-500 mb-1.5 text-xl block"></i>
-                    <div class="text-xs text-blue-900 font-bold">周遊卡使用</div>
-                    <div class="text-sm font-bold text-orange-700">Day 3 & Day 4</div>
+                <div class="flex-1 border-r border-blue-200 px-1">
+                    <i class="fa-solid fa-ticket text-orange-500 mb-1 text-lg block"></i>
+                    <div class="text-[11px] text-blue-900 font-bold">周遊卡 2日券</div>
+                    <div class="text-xs sm:text-sm font-bold text-orange-700">Day 3 & Day 4</div>
                 </div>
-                <div class="flex-1">
-                    <i class="fa-solid fa-plug text-blue-500 mb-1.5 text-xl block"></i>
-                    <div class="text-xs text-blue-900 font-bold">電壓插座</div>
-                    <div class="text-sm font-bold text-gray-800">同台灣 100V</div>
+                <div class="flex-1 pl-1 cursor-pointer hover: opacity-90" onclick="toggleDriverModal(true)">
+                    <i class="fa-solid fa-taxi text-amber-600 mb-1 text-lg block"></i>
+                    <div class="text-[11px] text-blue-900 font-bold">問路 / 搭車</div>
+                    <div class="text-xs sm:text-sm font-bold text-blue-700 underline">點開日文大字卡</div>
                 </div>
             </div>
 
@@ -127,57 +149,65 @@
                         <div class="text-xs text-red-700 font-bold mt-2 bg-white p-1.5 rounded border border-red-200 inline-block shadow-sm">🚨 17:00 離開市區，18:00 前抵達機場</div>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1">
-                    <div class="flex items-start justify-between gap-2">
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm space-y-1.5">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
                         <div>
                             <div class="text-xs text-gray-500 font-bold">🏨 住宿資訊（連續入住 4 晚）</div>
                             <div class="font-bold text-gray-900 text-base mt-0.5">嵐 Hotel Arashi 日本橋 2 號店</div>
                         </div>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Arashi+Nippombashi+2+No.008+%E5%A4%A7%E9%98%AA%E5%B8%82%E6%B5%AA%E9%80%9F%E5%8C%BA%E6%97%A5%E6%9C%AC%E6%A9%8B5-6-19" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-xs transition-colors shadow-sm no-print">
-                            <i class="fa-solid fa-location-dot"></i> 飯店導航
-                        </a>
+                        <div class="flex items-center gap-1.5 no-print">
+                            <button type="button" onclick="toggleDriverModal(true)" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold border border-amber-300 rounded-lg text-xs transition-colors shadow-sm active:scale-95">
+                                <i class="fa-solid fa-taxi"></i> 給司機看
+                            </button>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Arashi+Nippombashi+2+No.008+%E5%A4%A7%E9%98%AA%E5%B8%82%E6%B5%AA%E9%80%9F%E5%8C%BA%E6%97%A5%E6%9C%AC%E6%A9%8B5-6-19" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 rounded-lg text-xs transition-colors shadow-sm active:scale-95">
+                                <i class="fa-solid fa-location-dot"></i> 飯店導航
+                            </a>
+                        </div>
                     </div>
                     <div class="text-gray-700"><span class="font-medium">地址：</span>大阪市浪速区日本橋5-6-19</div>
-                    <div class="text-gray-700"><span class="font-medium">交通：</span>堺筋線【惠美須町站】1-A/2 號出口步行即達</div>
-                    <div class="text-gray-500 text-xs pt-1">入住：16:00 Check-in / 退房：11:00 Check-out</div>
+                    <div class="text-gray-700"><span class="font-medium">交通：</span><span class="inline-block px-1.5 py-0.5 text-[11px] font-bold rounded bg-amber-800 text-white mr-1">堺筋線 K</span>【惠美須町站】1-A/2 號出口步行即達</div>
+                    <div class="text-gray-500 text-xs pt-0.5">入住：16:00 Check-in / 退房：11:00 Check-out</div>
                 </div>
             </div>
 
             <!-- 5日交通與行程配置總覽（會隨試算表自動更新摘要） -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-map-location-dot text-red-800"></i> 5 日交通票券與行程配置
-                </h2>
+                <div class="flex items-center justify-between border-b pb-2 mb-3">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-red-800"></i> 5 日交通票券與行程配置
+                    </h2>
+                    <span class="text-xs text-gray-400 no-print">點擊可跳轉當日行程</span>
+                </div>
                 <div id="overview-days-summary" class="space-y-2.5 text-sm">
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200">
+                    <div onclick="switchTab('day1')" class="cursor-pointer flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition">
                         <div>
                             <span class="font-bold text-gray-900">Day 1 · 10/17 (六)</span>
                             <p class="text-xs text-gray-600 mt-0.5">關西機場抵達 ➔ 天神橋筋・天滿宮 ➔ 新世界本通</p>
                         </div>
                         <span class="shrink-0 text-xs font-bold bg-green-100 text-green-800 px-2.5 py-1 rounded-full border border-green-200">💳 Suica / ICOCA</span>
                     </div>
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200">
+                    <div onclick="switchTab('day2')" class="cursor-pointer flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition">
                         <div>
                             <span class="font-bold text-gray-900">Day 2 · 10/18 (日)</span>
                             <p class="text-xs text-gray-600 mt-0.5">勝尾寺祈福 ➔ 梅田商圈巡禮 ➔ 心齋橋・難波燒肉</p>
                         </div>
                         <span class="shrink-0 text-xs font-bold bg-green-100 text-green-800 px-2.5 py-1 rounded-full border border-green-200">💳 Suica / ICOCA</span>
                     </div>
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200">
+                    <div onclick="switchTab('day3')" class="cursor-pointer flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200 hover:bg-orange-100/60 transition">
                         <div>
                             <span class="font-bold text-gray-900">Day 3 · 10/19 (一)</span>
                             <p class="text-xs text-gray-600 mt-0.5">大阪城・御座船 ➔ 大阪港摩天輪・聖瑪麗亞號 ➔ 藍天大廈 ➔ 今昔館</p>
                         </div>
                         <span class="shrink-0 text-xs font-bold bg-orange-100 text-orange-800 px-2.5 py-1 rounded-full border border-orange-300">🎟️ 大阪周遊卡 D1</span>
                     </div>
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200">
+                    <div onclick="switchTab('day4')" class="cursor-pointer flex items-center justify-between p-3 rounded-xl bg-orange-50/70 border border-orange-200 hover:bg-orange-100/60 transition">
                         <div>
                             <span class="font-bold text-gray-900">Day 4 · 10/20 (二)</span>
                             <p class="text-xs text-gray-600 mt-0.5">四天王寺 ➔ 天王寺動物園・美術館 ➔ 通天閣 ➔ 道頓堀遊船</p>
                         </div>
                         <span class="shrink-0 text-xs font-bold bg-orange-100 text-orange-800 px-2.5 py-1 rounded-full border border-orange-300">🎟️ 大阪周遊卡 D2</span>
                     </div>
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200">
+                    <div onclick="switchTab('day5')" class="cursor-pointer flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition">
                         <div>
                             <span class="font-bold text-gray-900">Day 5 · 10/21 (三)</span>
                             <p class="text-xs text-gray-600 mt-0.5">日本橋動漫街 ➔ 難波八坂神社・今宮戎神社・超市補貨 ➔ 關西機場</p>
@@ -265,28 +295,36 @@
             </div>
         </section>
 
-        <!-- === 4. 新手指南 (VJW, 交通, 退稅) === -->
+        <!-- === 4. 新手指南 (VJW, 交通, 退稅, 緊急資訊) === -->
         <section id="tab-guide" class="tab-content hidden print-page space-y-4">
             <!-- VJW 通關 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
-                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-passport text-blue-600"></i> 一、VJW 填寫與電子通關
-                </h2>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-passport text-blue-600"></i> 一、VJW 填寫與電子通關
+                    </h2>
+                    <a href="https://services.digital.go.jp/zh-cmn-hant/visit-japan-web/" target="_blank" rel="noopener noreferrer" class="text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg inline-flex items-center gap-1 shadow-sm no-print">
+                        開啟 VJW 官網 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
                 <div class="space-y-3 text-gray-700">
-                    <p>日本採電子化通關，建議出發前 <strong>3~5天</strong> 填寫，到機場就能快速通關！截圖存好 <strong>QR Code</strong> 以防沒網路。</p>
+                    <p>日本採電子化通關，請先填好並把 <strong>QR Code 截圖存在手機相簿</strong> 以防機場沒網路！</p>
                     <div class="border rounded-xl p-3.5 bg-gray-50 text-xs mt-3">
                         <div class="font-bold text-gray-900 mb-2 border-b pb-1.5 flex items-center justify-between">
                             <span>📍 VJW 必填：第一晚住宿資料</span>
                             <span class="text-[11px] text-gray-500 font-normal no-print">點擊右側按鈕可直接複製</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <div class="bg-white p-2 rounded border border-gray-200">
-                                <span class="text-gray-500">都道府縣：</span><br>
-                                <span class="font-bold text-sm">Osaka (大阪府)</span>
+                            <div class="bg-white p-2 rounded border border-gray-200 flex items-center justify-between">
+                                <div>
+                                    <span class="text-gray-500">郵遞區號 (選填自動帶入)：</span><br>
+                                    <span class="font-bold text-sm font-mono">5560005</span>
+                                </div>
+                                <button type="button" onclick="copyText('5560005')" class="shrink-0 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium no-print">複製</button>
                             </div>
                             <div class="bg-white p-2 rounded border border-gray-200">
-                                <span class="text-gray-500">市区町村：</span><br>
-                                <span class="font-bold text-sm">Naniwa-ku, Osaka-shi</span>
+                                <span class="text-gray-500">都道府縣 / 市区町村：</span><br>
+                                <span class="font-bold text-sm">Osaka / Naniwa-ku, Osaka-shi</span>
                             </div>
                             <div class="sm:col-span-2 bg-white p-2 rounded border border-gray-200 flex items-center justify-between gap-2">
                                 <div>
@@ -314,7 +352,7 @@
                 </div>
             </div>
 
-            <!-- 電車交通 (已更新為 Day 3 & Day 4 兩日周遊卡) -->
+            <!-- 電車交通 (Day 3 & Day 4 兩日周遊卡 + 地鐵顏色說明) -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
                 <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
                     <i class="fa-solid fa-train-subway text-green-600"></i> 二、大阪交通怎麼搭？
@@ -357,23 +395,63 @@
                             <div>🚨 <strong>週二休館提醒：</strong>生活今昔館與天空美術館每週二休館（已排在 Day 3 週一，完美避開！）。</div>
                         </div>
                     </div>
+
+                    <!-- 常用地鐵路線顏色對照小卡 -->
+                    <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 text-xs">
+                        <div class="font-bold text-gray-800 mb-2">🎨 我們最常搭的 4 條地鐵代表色（進車站認顏色最清楚）：</div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <div class="bg-white p-2 rounded border flex items-center gap-1.5">
+                                <span class="w-5 h-5 rounded-full bg-amber-800 text-white font-bold flex items-center justify-center text-[10px] shrink-0">K</span>
+                                <span><strong>堺筋線</strong><br><span class="text-[10px] text-gray-500">飯店(惠美須町)</span></span>
+                            </div>
+                            <div class="bg-white p-2 rounded border flex items-center gap-1.5">
+                                <span class="w-5 h-5 rounded-full bg-red-600 text-white font-bold flex items-center justify-center text-[10px] shrink-0">M</span>
+                                <span><strong>御堂筋線</strong><br><span class="text-[10px] text-gray-500">難波/梅田/勝尾寺</span></span>
+                            </div>
+                            <div class="bg-white p-2 rounded border flex items-center gap-1.5">
+                                <span class="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-[10px] shrink-0">C</span>
+                                <span><strong>中央線</strong><br><span class="text-[10px] text-gray-500">大阪城/大阪港</span></span>
+                            </div>
+                            <div class="bg-white p-2 rounded border flex items-center gap-1.5">
+                                <span class="w-5 h-5 rounded-full bg-purple-700 text-white font-bold flex items-center justify-center text-[10px] shrink-0">T</span>
+                                <span><strong>谷町線</strong><br><span class="text-[10px] text-gray-500">東梅田/四天王寺</span></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- 退稅規定 -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-sm">
-                <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-yen-sign text-amber-600"></i> 三、免稅退稅怎麼算？
-                </h2>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-yen-sign text-amber-600"></i> 三、免稅退稅怎麼算？
+                    </h2>
+                    <button type="button" onclick="toggleCalcModal(true)" class="text-xs font-bold bg-amber-500 hover:bg-amber-400 text-gray-950 px-3 py-1.5 rounded-lg inline-flex items-center gap-1 shadow-sm no-print">
+                        <i class="fa-solid fa-calculator"></i> 打開免稅計算機
+                    </button>
+                </div>
                 <div class="space-y-3 text-gray-700">
                     <ul class="list-disc list-inside space-y-2 ml-1 text-sm">
-                        <li><strong>免稅門檻：</strong>同一天在同一家貼有「Tax-Free」的商店買滿 <strong>5,000 日圓</strong>（未稅）。</li>
+                        <li><strong>免稅門檻：</strong>同一天在同一家貼有「Tax-Free」的商店買滿 <strong>5,000 日圓</strong>（未稅，含稅約 5,500 日圓）。</li>
                         <li><strong>結帳方式：</strong>出示<strong>「護照正本」</strong>，直接以免稅後的價格結帳（2026年11月才改新制，我們10月去一樣現場直接免稅！）。</li>
                     </ul>
                     <div class="bg-red-50 p-3 rounded-lg border border-red-200 mt-2 text-xs">
                         <strong class="text-red-700">⚠️ 藥妝零食大禁忌 (消耗品)：</strong><br>
                         免稅藥妝與零食會用透明袋封起來。<strong class="text-gray-900">在日本期間絕對不可以拆開！</strong>若查到拆封會被要求補繳 10% 稅金。
                     </div>
+                </div>
+            </div>
+
+            <!-- 緊急聯絡小卡 -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 text-xs text-gray-600 flex flex-wrap items-center justify-between gap-2">
+                <div class="font-bold text-gray-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-kit-medical text-red-600"></i> 緊急求助電話：
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <span>🚓 報警：<strong>110</strong></span>
+                    <span>🚑 救護車/火警：<strong>119</strong></span>
+                    <span>🇹🇼 駐大阪辦事處急難救助：<a href="tel:+819087944568" class="text-blue-600 underline font-mono">+81-90-8794-4568</a></span>
                 </div>
             </div>
         </section>
@@ -385,25 +463,129 @@
 
     </main>
 
+    <!-- ========================================== -->
+    <!-- 彈出工具 1：日圓匯率 & 免稅門檻計算機 Modal -->
+    <!-- ========================================== -->
+    <div id="calc-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 no-print" onclick="if(event.target===this) toggleCalcModal(false)">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4">
+            <div class="flex items-center justify-between border-b pb-2.5">
+                <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-amber-500"></i> 日圓匯率 & 免稅計算機
+                </h3>
+                <button type="button" onclick="toggleCalcModal(false)" class="text-gray-400 hover:text-gray-700 w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-sm">
+                <div>
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <label for="jpy-input" class="font-bold text-gray-700">輸入日圓金額 (JPY)</label>
+                        <span>匯率：<input id="rate-input" type="number" step="0.001" value="0.215" oninput="calculateJPY()" class="w-16 text-center border rounded px-1 py-0.5 text-gray-800 font-mono"></span>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">¥</span>
+                        <input id="jpy-input" type="number" inputmode="decimal" placeholder="例如：5500" oninput="calculateJPY()" class="w-full pl-8 pr-16 py-2.5 text-lg font-bold font-mono border-2 border-amber-300 rounded-xl focus:outline-none focus:border-red-700">
+                        <button type="button" onclick="document.getElementById('jpy-input').value='';calculateJPY();" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600 px-2 py-1">清除</button>
+                    </div>
+                </div>
+
+                <!-- 快速金額按鈕 -->
+                <div class="flex gap-1.5 text-xs">
+                    <button type="button" onclick="addJPY(1000)" class="flex-1 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-mono font-bold text-gray-700">+1,000</button>
+                    <button type="button" onclick="addJPY(3000)" class="flex-1 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-mono font-bold text-gray-700">+3,000</button>
+                    <button type="button" onclick="addJPY(5500)" class="flex-1 py-1.5 bg-amber-100 hover:bg-amber-200 rounded-lg font-mono font-bold text-amber-900">5,500(免稅)</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5 pt-1">
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <div class="text-[11px] text-gray-500">折合台幣 (原價)</div>
+                        <div id="twd-output" class="text-lg font-bold text-gray-900 font-mono mt-0.5">NT$ 0</div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-xl border border-red-200">
+                        <div class="text-[11px] text-red-700 font-bold">免稅後約 (÷1.1)</div>
+                        <div id="taxfree-twd-output" class="text-lg font-bold text-red-800 font-mono mt-0.5">NT$ 0</div>
+                        <div id="taxfree-jpy-output" class="text-[11px] text-red-600 font-mono">¥ 0 (省 ¥0)</div>
+                    </div>
+                </div>
+
+                <!-- 免稅湊單提示 -->
+                <div id="taxfree-status" class="text-xs p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-center font-medium">
+                    💡 輸入含稅金額，自動幫您算還差多少達 5,000 未稅免稅門檻！
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 彈出工具 2：給計程車司機 / 店員看的大字卡 Modal -->
+    <!-- ========================================== -->
+    <div id="driver-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4 no-print" onclick="if(event.target===this) toggleDriverModal(false)">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 space-y-3 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b pb-2">
+                <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-taxi text-amber-600"></i> 乘車與問路「日文指指通」
+                </h3>
+                <button type="button" onclick="toggleDriverModal(false)" class="text-gray-400 hover:text-gray-700 w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-500">直接把手機畫面拿給計程車司機或店員看即可：</p>
+
+            <div class="space-y-2.5">
+                <div class="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300">
+                    <div class="text-xs font-bold text-amber-800 mb-1">🏨 請載我回飯店（嵐 日本橋2號店）</div>
+                    <div class="text-lg font-bold text-gray-900 leading-snug">
+                        この住所までお願いします：<br>
+                        <span class="text-red-800 text-xl">大阪市浪速区日本橋 5-6-19</span>
+                    </div>
+                    <div class="text-xs text-gray-600 mt-1">（堺筋線「恵美須町駅」1-A / 2番出口の近く）</div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                    <div class="text-xs font-bold text-gray-500 mb-1">⛩️ Day 2：請載我們去「勝尾寺」</div>
+                    <div class="text-lg font-bold text-gray-900">
+                        箕面市の「<span class="text-red-800">勝尾寺（かつおうじ）</span>」までお願いします。
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                    <div class="text-xs font-bold text-gray-500 mb-1">🚢 Day 4：道頓堀遊船換票（出示周遊卡）</div>
+                    <div class="text-base font-bold text-gray-900">
+                        大阪周遊パスで、一番早い便のチケットを交換したいです。
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                    <div class="text-xs font-bold text-gray-500 mb-1">🛍️ 結帳：請問可以辦理免稅嗎？</div>
+                    <div class="text-base font-bold text-gray-900">
+                        免税（めんぜい / Tax-Free）はできますか？パスポートがあります。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 浮動返回頂部按鈕 -->
-    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-75 hover:bg-gray-900 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-50 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-gray-800 bg-opacity-75 hover:bg-gray-900 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center text-xl z-40 opacity-0 pointer-events-none transition-all duration-300 no-print" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
     <script>
         let currentActiveTab = 'overview';
-        const CACHE_KEY = 'osaka_itinerary_csv_cache_v4';
+        let hasAutoSwitchedToday = false;
+        const CACHE_KEY = 'osaka_itinerary_csv_cache_v5';
 
         // 對應天數的日期與交通票券配置（Day 3、4 使用大阪周遊卡，Day 1、2、5 使用 Suica/ICOCA）
         const DAY_META = {
-            1: { date: '10/17 (六)', transport: '💳 Suica / ICOCA 隨搭隨扣', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' },
-            2: { date: '10/18 (日)', transport: '💳 Suica / ICOCA 隨搭隨扣', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' },
-            3: { date: '10/19 (一)', transport: '🎟️ 大阪周遊卡 (Day 1)', isPassDay: true, badgeClass: 'bg-orange-100 text-orange-800 border-orange-300' },
-            4: { date: '10/20 (二)', transport: '🎟️ 大阪周遊卡 (Day 2)', isPassDay: true, badgeClass: 'bg-orange-100 text-orange-800 border-orange-300' },
-            5: { date: '10/21 (三)', transport: '💳 Suica / ICOCA ＋ 南海電鐵', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' }
+            1: { date: '10/17 (六)', isoDate: '2026-10-17', transport: '💳 Suica / ICOCA 隨搭隨扣', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' },
+            2: { date: '10/18 (日)', isoDate: '2026-10-18', transport: '💳 Suica / ICOCA 隨搭隨扣', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' },
+            3: { date: '10/19 (一)', isoDate: '2026-10-19', transport: '🎟️ 大阪周遊卡 (Day 1)', isPassDay: true, badgeClass: 'bg-orange-100 text-orange-800 border-orange-300' },
+            4: { date: '10/20 (二)', isoDate: '2026-10-20', transport: '🎟️ 大阪周遊卡 (Day 2)', isPassDay: true, badgeClass: 'bg-orange-100 text-orange-800 border-orange-300' },
+            5: { date: '10/21 (三)', isoDate: '2026-10-21', transport: '💳 Suica / ICOCA ＋ 南海電鐵', isPassDay: false, badgeClass: 'bg-green-100 text-green-800 border-green-200' }
         };
 
-        // 大阪周遊卡適用景點關鍵字（用於自動標記 Day 3 & Day 4 免費入場設施與動態更新新手指南）
+        // 大阪周遊卡適用景點關鍵字
         const PASS_KEYWORDS = [
             '大阪城', '天守閣', '御座船', '天保山', '摩天輪', '聖瑪麗亞號',
             '藍天大廈', '空中庭園', '天空美術館', '絹谷幸二', '生活今昔館', '今昔館',
@@ -411,7 +593,7 @@
             '道頓堀觀光遊船', '道頓堀遊船', '水上觀光船', 'HEP FIVE'
         ];
 
-        // 內建大阪行程專屬精準地名庫（自動掃描標題與詳細說明，支援單筆行程多個景點獨立導航）
+        // 內建大阪行程專屬精準地名庫
         const KNOWN_PLACES = [
             { label: '桃園機場 T1', keywords: ['桃園機場', '桃園國際機場'], query: '桃園國際機場第一航廈' },
             { label: '關西機場 T1', keywords: ['關西機場', '關西國際機場'], query: '関西国際空港 第1ターミナル' },
@@ -461,6 +643,92 @@
             { label: 'AEON 超市', keywords: ['AEON'], query: 'マックスバリュ 難波' }
         ];
 
+        // 計算出發倒數或旅遊當日狀態
+        function initTripStatusBanner() {
+            const pill = document.getElementById('trip-status-pill');
+            if (!pill) return;
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const start = new Date('2026-10-17T00:00:00');
+            const diffDays = Math.ceil((start - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / (1000 * 60 * 60 * 24));
+
+            for (const [dNum, meta] of Object.entries(DAY_META)) {
+                if (meta.isoDate === todayStr) {
+                    pill.innerText = `📍 今日為 Day ${dNum}`;
+                    pill.className = 'shrink-0 text-[11px] font-bold bg-red-700 text-white px-2.5 py-0.5 rounded-full whitespace-nowrap no-print';
+                    return parseInt(dNum, 10);
+                }
+            }
+            if (diffDays > 0 && diffDays <= 60) {
+                pill.innerText = `⏳ 倒數 ${diffDays} 天出發`;
+            }
+            return null;
+        }
+
+        // 匯率與免稅計算機邏輯
+        function toggleCalcModal(show) {
+            const modal = document.getElementById('calc-modal');
+            if (!modal) return;
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => document.getElementById('jpy-input')?.focus(), 100);
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function addJPY(amount) {
+            const input = document.getElementById('jpy-input');
+            if (!input) return;
+            const current = parseFloat(input.value) || 0;
+            input.value = current + amount;
+            calculateJPY();
+        }
+
+        function calculateJPY() {
+            const jpy = parseFloat(document.getElementById('jpy-input')?.value) || 0;
+            const rate = parseFloat(document.getElementById('rate-input')?.value) || 0.215;
+            try { localStorage.setItem('osaka_jpy_rate', String(rate)); } catch (e) {}
+
+            const twd = Math.round(jpy * rate);
+            const taxFreeJpy = Math.round(jpy / 1.1);
+            const taxFreeTwd = Math.round(taxFreeJpy * rate);
+            const savedJpy = Math.round(jpy - taxFreeJpy);
+
+            document.getElementById('twd-output').innerText = `NT$ ${twd.toLocaleString()}`;
+            document.getElementById('taxfree-twd-output').innerText = `NT$ ${taxFreeTwd.toLocaleString()}`;
+            document.getElementById('taxfree-jpy-output').innerText = `¥ ${taxFreeJpy.toLocaleString()} (省 ¥${savedJpy.toLocaleString()})`;
+
+            const statusEl = document.getElementById('taxfree-status');
+            if (!statusEl) return;
+            if (jpy <= 0) {
+                statusEl.className = 'text-xs p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-center font-medium';
+                statusEl.innerText = '💡 輸入含稅金額，自動幫您算還差多少達 5,000 未稅免稅門檻！';
+            } else if (jpy < 5500) {
+                const remainIncl = Math.ceil(5500 - jpy);
+                statusEl.className = 'text-xs p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-center font-bold';
+                statusEl.innerText = `🛒 還差約 ¥ ${remainIncl.toLocaleString()} (含稅) 即可湊滿免稅門檻！`;
+            } else {
+                statusEl.className = 'text-xs p-2.5 rounded-lg bg-green-50 border border-green-300 text-green-800 text-center font-bold';
+                statusEl.innerText = '✅ 已達免稅門檻！結帳請出示「護照正本」享免稅價';
+            }
+        }
+
+        // 乘車與問路指指通 Modal
+        function toggleDriverModal(show) {
+            const modal = document.getElementById('driver-modal');
+            if (!modal) return;
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
         // 複製文字到剪貼簿
         function copyText(text) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -497,11 +765,11 @@
             if (targetTab) targetTab.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
+                btn.className = 'tab-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
             });
             const activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) {
-                activeBtn.className = 'tab-btn flex-1 py-2 px-3.5 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm';
+                activeBtn.className = 'tab-btn flex-1 py-2 px-3 rounded-lg font-bold whitespace-nowrap transition text-center bg-red-800 text-white shadow-sm';
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -532,7 +800,6 @@
             const str = rawDay.trim();
             if (!str) return null;
 
-            // 支援格式: "Day 1", "Day1", "D1", "第1天", "Day 3 (周遊卡)", 或純數字 "1"~"9"
             const matchPrefix = str.match(/^(?:day\s*|d\s*|第\s*)([1-9])\b/i);
             if (matchPrefix) {
                 const num = parseInt(matchPrefix[1], 10);
@@ -545,7 +812,6 @@
                 return { num: num, label: `Day ${num}`, rawNote: str };
             }
 
-            // 支援中文天數: "第一天" ~ "第七天"
             const cnNums = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7 };
             const matchCn = str.match(/^第([一二三四五六七])天/);
             if (matchCn && cnNums[matchCn[1]]) {
@@ -553,15 +819,12 @@
                 return { num: num, label: `Day ${num}`, rawNote: str };
             }
 
-            // 支援直接填日期: "10/17" ~ "10/21"
             const dateMap = { '10/17': 1, '10/18': 2, '10/19': 3, '10/20': 4, '10/21': 5 };
             for (const [dateKey, dNum] of Object.entries(dateMap)) {
                 if (str.startsWith(dateKey)) {
                     return { num: dNum, label: `Day ${dNum}`, rawNote: str };
                 }
             }
-
-            // 左邊未排天數或非天數格式的一律忽略不顯示
             return null;
         }
 
@@ -588,15 +851,13 @@
             return 9999;
         }
 
-        // 將查詢字串轉為 Google Maps URL
         function toGoogleMapsUrl(queryStr) {
             if (/^https?:\/\//i.test(queryStr)) return queryStr;
             return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryStr)}`;
         }
 
-        // 智慧型導航解析器（支援 F 欄優先、單筆行程自動拆解多個子景點導航、排除非地點動作）
+        // 智慧型導航解析器
         function resolveNavLinks(item) {
-            // 1. 若 F 欄 (Location) 有填寫，最高優先使用（支援用逗號或頓號分隔多個地點）
             if (item.location) {
                 const parts = item.location.split(/[、,，/]/).map(s => s.trim()).filter(Boolean);
                 if (parts.length > 0) {
@@ -607,12 +868,10 @@
                 }
             }
 
-            // 2. 排除不需導航的純動作事件（如退房、起飛返台）
             if (/退房|Check-out|起飛返台|收行李/i.test(item.title)) {
                 return [];
             }
 
-            // 3. 掃描標題與詳細說明，比對內建大阪精準地名庫（可同時匹配同一筆行程內的多個景點）
             const combinedText = `${item.title} ${item.detail}`;
             const matchedPlaces = [];
             const seenLabels = new Set();
@@ -630,7 +889,6 @@
                 return matchedPlaces;
             }
 
-            // 4. 若為新增的未知景點，自動清理「午餐：」「出發前往」等非地名前綴詞後導航
             let cleanTitle = item.title
                 .replace(/^(早餐|午餐|晚餐|早午餐|宵夜|下午茶|上午|中午|下午|午後|傍晚|夜間|晚上|出發前往|前往|離開市區前往|抵達|參拜|體驗)\s*[:：]?\s*/g, '')
                 .replace(/櫃檯報到|刺激體驗|商圈巡禮|逛街|晚餐|午餐/g, '')
@@ -647,7 +905,7 @@
             }];
         }
 
-        // 將文字中的網址自動轉為超連結並高亮關鍵提醒字眼
+        // 將文字中的網址、時限提醒與「大阪地鐵路線代表色」自動美化
         function formatDetailText(text) {
             if (!text) return '';
             const escaped = text
@@ -658,17 +916,24 @@
                 /(https?:\/\/[^\s<]+)/g,
                 '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline break-all hover:text-blue-800"><i class="fa-solid fa-arrow-up-right-from-square text-[10px] mr-0.5"></i>開啟連結</a>'
             );
-            // 高亮重要時限提醒（如 15:00前、18:00前、換領等）
-            const highlighted = linked.replace(
+            // 高亮重要時限提醒
+            let formatted = linked.replace(
                 /(15:00\s*前|18:00\s*前|04:30\s*前|免費入場|先至現場換領[^，。]*)/g,
                 '<strong class="text-red-700 bg-red-50 px-1 rounded">$1</strong>'
             );
-            return highlighted.replace(/\n/g, '<br>');
+            // 自動為大阪地鐵路線加上官方代表色膠囊標籤
+            formatted = formatted
+                .replace(/堺筋線\s*(?:\(K線\))?|K線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-amber-800 text-white mx-0.5">堺筋線 K</span>')
+                .replace(/御堂筋線\s*(?:\(M線\))?|M線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-red-600 text-white mx-0.5">御堂筋線 M</span>')
+                .replace(/中央線\s*(?:\(C線\))?|C線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-emerald-600 text-white mx-0.5">中央線 C</span>')
+                .replace(/谷町線\s*(?:\(T線\))?|T線/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-purple-700 text-white mx-0.5">谷町線 T</span>')
+                .replace(/南海機場線|南海電鐵/g, '<span class="inline-block px-1.5 py-0.2 text-[11px] font-bold rounded bg-blue-700 text-white mx-0.5">南海電鐵</span>');
+
+            return formatted.replace(/\n/g, '<br>');
         }
 
         // 動態更新首頁 5日總覽 與 新手指南中的周遊卡景點清單
         function updateDynamicSummaries(sortedDays) {
-            // 1. 更新新手指南中 Day 3 & Day 4 的周遊卡景點列表
             const day3PassEl = document.getElementById('pass-day3-list');
             const day4PassEl = document.getElementById('pass-day4-list');
 
@@ -685,7 +950,6 @@
                 }
             });
 
-            // 2. 更新首頁「5 日交通票券與行程配置」摘要
             const overviewSummaryEl = document.getElementById('overview-days-summary');
             if (overviewSummaryEl && sortedDays.length > 0) {
                 overviewSummaryEl.innerHTML = sortedDays.map(([dayNum, dayObj]) => {
@@ -731,7 +995,6 @@
                 const parsedDay = parseValidDay(row[0]);
                 const title = row[2] ? row[2].trim() : '';
 
-                // 嚴格過濾：左邊沒有排天數（或無標題）的列一律忽略不計
                 if (!parsedDay || !title) return;
 
                 if (!daysMap.has(parsedDay.num)) {
@@ -754,10 +1017,8 @@
                 });
             });
 
-            // 依天數由小到大排序 (Day 1 -> Day 5)
             const sortedDays = Array.from(daysMap.entries()).sort((a, b) => a[0] - b[0]);
 
-            // 同步更新首頁與新手指南的動態摘要
             updateDynamicSummaries(sortedDays);
 
             const navContainer = document.getElementById('main-nav');
@@ -779,7 +1040,6 @@
                 };
                 const dateSubtitle = meta.date ? ` · ${meta.date}` : '';
 
-                // 同一天內依時間自動排序，若無填時間則保持試算表順序
                 const items = dayObj.items.sort((a, b) => {
                     if (a.timeMinutes !== 9999 && b.timeMinutes !== 9999) {
                         return a.timeMinutes - b.timeMinutes;
@@ -789,7 +1049,7 @@
 
                 // 1. 生成上方導覽按鈕
                 const btn = document.createElement('button');
-                btn.className = 'tab-btn dynamic-day-btn flex-1 py-2 px-3.5 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
+                btn.className = 'tab-btn dynamic-day-btn flex-1 py-2 px-3 rounded-lg font-medium whitespace-nowrap transition text-center text-gray-600 hover:bg-gray-100 hover:text-red-800';
                 btn.id = 'btn-' + tabId;
                 btn.innerText = dayName;
                 btn.onclick = () => switchTab(tabId);
@@ -801,7 +1061,6 @@
                 section.className = 'tab-content hidden print-page space-y-4';
 
                 let timelineHtml = items.map(item => {
-                    // 處理分類標籤顏色
                     let badgeHtml = '';
                     if (item.category) {
                         let badgeColor = 'bg-gray-100 text-gray-600 border-gray-200';
@@ -814,7 +1073,6 @@
                         badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border ${badgeColor}">${item.category}</span>`;
                     }
 
-                    // 檢查是否為 Day 3 / Day 4 大阪周遊卡適用景點
                     const passBadgeHtml = isOsakaPassAttraction(dayNum, item)
                         ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300"><i class="fa-solid fa-ticket text-[10px]"></i>周遊卡免費</span>`
                         : '';
@@ -823,7 +1081,6 @@
                         ? `<span class="inline-flex items-center text-red-800 bg-red-50 px-2 py-0.5 rounded-md border border-red-100 text-xs font-mono font-bold tracking-wide">${item.time}</span>`
                         : '';
 
-                    // 解析導航連結
                     const navLinks = resolveNavLinks(item);
                     const primaryNav = navLinks.length > 0 ? navLinks[0] : null;
                     const navButtonHtml = primaryNav
@@ -846,10 +1103,8 @@
 
                     return `
                     <div class="relative bg-white p-4 rounded-xl border border-gray-100 shadow-sm ml-2 mt-4 hover:border-red-200 transition-colors">
-                        <!-- 時間軸紅點 -->
                         <div class="absolute -left-[30px] top-4 w-4 h-4 bg-red-800 rounded-full border-[3px] border-white shadow-sm z-10"></div>
                         
-                        <!-- 第一排：左側 [時間 + 分類標籤 + 周遊卡標籤] 固定同行，右側 [導航按鈕] 絕不跑版 -->
                         ${hasTopBar ? `
                         <div class="flex items-center justify-between gap-2 mb-1.5">
                             <div class="flex flex-wrap items-center gap-1.5">
@@ -860,15 +1115,12 @@
                             ${navButtonHtml}
                         </div>` : ''}
 
-                        <!-- 第二排：行程標題獨立完整一行 -->
                         <div class="font-bold text-gray-900 text-[15px] sm:text-base leading-snug break-words">
                             ${item.title}
                         </div>
 
-                        <!-- 第三排：詳細說明 -->
                         ${item.detail ? `<div class="mt-2.5 text-xs text-gray-600 bg-gray-50 p-2.5 rounded-lg border border-gray-100 leading-relaxed break-words">${formatDetailText(item.detail)}</div>` : ''}
 
-                        <!-- 第四排：若該時段包含多個餐廳或子景點，自動生成各別導航按鈕 -->
                         ${multiNavChipsHtml}
                     </div>
                     `;
@@ -899,7 +1151,12 @@
                 sectionsContainer.appendChild(section);
             });
 
-            if (currentActiveTab && document.getElementById('tab-' + currentActiveTab)) {
+            // 若在旅遊期間 (10/17~10/21) 首次打開網頁，自動幫使用者切換到「今日行程」
+            const todayDayNum = initTripStatusBanner();
+            if (!hasAutoSwitchedToday && todayDayNum && document.getElementById('tab-day' + todayDayNum)) {
+                hasAutoSwitchedToday = true;
+                switchTab('day' + todayDayNum);
+            } else if (currentActiveTab && document.getElementById('tab-' + currentActiveTab)) {
                 switchTab(currentActiveTab);
             }
 
@@ -907,8 +1164,8 @@
             if (syncBadge) {
                 syncBadge.innerText = isCached ? '離線快取版' : '已同步最新';
                 syncBadge.className = isCached
-                    ? 'text-[11px] bg-amber-600 px-1.5 py-0.5 rounded shadow-sm font-normal'
-                    : 'text-[11px] bg-green-700 px-1.5 py-0.5 rounded shadow-sm font-normal';
+                    ? 'text-[10px] sm:text-[11px] bg-amber-600 px-1.5 py-0.5 rounded shadow-sm font-normal shrink-0'
+                    : 'text-[10px] sm:text-[11px] bg-green-700 px-1.5 py-0.5 rounded shadow-sm font-normal shrink-0';
             }
         }
 
@@ -958,7 +1215,6 @@
             }
         }
 
-        // 重置行李檢查表
         function resetChecklist() {
             const checkboxes = document.querySelectorAll('.check-item');
             checkboxes.forEach(cb => {
@@ -969,7 +1225,6 @@
             updateChecklistProgress();
         }
 
-        // 行李檢查表勾選記憶功能
         function initChecklistStorage() {
             const checkboxes = document.querySelectorAll('.check-item');
             checkboxes.forEach(cb => {
@@ -985,7 +1240,6 @@
             updateChecklistProgress();
         }
 
-        // 監聽滾動事件：顯示「返回頂部」按鈕
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('backToTop');
             if (window.scrollY > 300) {
@@ -997,8 +1251,12 @@
             }
         });
 
-        // 頁面載入後初始化
         document.addEventListener('DOMContentLoaded', () => {
+            initTripStatusBanner();
+            const savedRate = localStorage.getItem('osaka_jpy_rate');
+            if (savedRate && document.getElementById('rate-input')) {
+                document.getElementById('rate-input').value = savedRate;
+            }
             loadGoogleSheet();
             initChecklistStorage();
             const printBtn = document.getElementById('printBtn');
