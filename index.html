@@ -124,7 +124,7 @@
                     <div class="text-[11px] text-blue-900 font-bold">周遊卡 2日券</div>
                     <div class="text-xs sm:text-sm font-bold text-orange-700">Day 3 & Day 4</div>
                 </div>
-                <div class="flex-1 pl-1 cursor-pointer hover: opacity-90" onclick="toggleDriverModal(true)">
+                <div class="flex-1 pl-1 cursor-pointer hover:opacity-90" onclick="toggleDriverModal(true)">
                     <i class="fa-solid fa-taxi text-amber-600 mb-1 text-lg block"></i>
                     <div class="text-[11px] text-blue-900 font-bold">問路 / 搭車</div>
                     <div class="text-xs sm:text-sm font-bold text-blue-700 underline">點開日文大字卡</div>
@@ -218,39 +218,85 @@
             </div>
         </section>
 
-        <!-- === 2. 行李檢查 === -->
+        <!-- === 2. 個人專屬行李檢查表 (依照 5 天行程量身打造) === -->
         <section id="tab-checklist" class="tab-content hidden print-page space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3">
-                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard-check text-red-800"></i> 出發前打包檢查表
-                    </h2>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2.5 mb-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-red-800"></i> 個人專屬行程打包清單
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-0.5">針對勝尾寺、通天閣溜滑梯、燒肉吃到飽與動漫/羽球採買量身訂製（自動儲存進度）</p>
+                    </div>
                     <div class="flex items-center gap-2 no-print">
-                        <span id="checklist-progress" class="text-xs font-bold text-red-800 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">進度 0/11</span>
-                        <button type="button" onclick="resetChecklist()" class="text-xs text-gray-500 hover:text-red-700 underline">重置</button>
+                        <span id="checklist-progress" class="text-xs font-bold text-red-800 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">進度 0/24</span>
+                        <button type="button" onclick="resetChecklist()" class="text-xs text-gray-500 hover:text-red-700 underline">全部重置</button>
                     </div>
                 </div>
-                <p class="text-xs text-gray-500 mb-3">💡 勾選狀態會自動保存在您的手機瀏覽器中，方便隨時確認進度：</p>
+
+                <!-- 進度條 -->
+                <div class="w-full bg-gray-200 rounded-full h-2 mb-4 overflow-hidden no-print">
+                    <div id="checklist-bar" class="bg-red-700 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" id="checklist-container">
-                    <div class="border p-3.5 rounded-xl bg-gray-50">
-                        <h3 class="font-bold text-red-800 mb-2 border-b pb-1">🪪 證件、票券與財物</h3>
-                        <div class="space-y-2 text-gray-700">
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-1" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-red-700">護照正本</strong>（效期需 6 個月以上）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-2" class="check-item rounded text-red-800 mt-1"> <span>日圓現金（備少許硬幣與千圓鈔）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-3" class="check-item rounded text-red-800 mt-1"> <span>海外刷卡信用卡（建議準備 2 張備用）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-4" class="check-item rounded text-red-800 mt-1"> <span><strong>Suica / ICOCA</strong>（Day 1、2、5 搭車用）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-6" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-orange-700">大阪周遊卡 2日券憑證</strong>（Day 3、4 使用）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-5" class="check-item rounded text-red-800 mt-1"> <span>Visit Japan Web QR Code 截圖</span></label>
+                    <!-- 1. 證件、票券與金流 -->
+                    <div class="border border-red-100 p-3.5 rounded-xl bg-red-50/40">
+                        <h3 class="font-bold text-red-800 mb-2.5 border-b border-red-100 pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-passport"></i> 1. 隨身證件、票券與金流
+                        </h3>
+                        <div class="space-y-2.5 text-gray-700 text-xs sm:text-sm">
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-1" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-red-700">護照正本</strong>（效期滿6個月，隨身備查＋免稅必備）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-2" class="check-item rounded text-red-800 mt-1"> <span><strong>VJW QR Code 截圖</strong>（存手機相簿最愛，防機場無網）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-3" class="check-item rounded text-red-800 mt-1"> <span><strong>嵐飯店入住密碼/確認信截圖</strong>（自助 Check-in 必看）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-4" class="check-item rounded text-red-800 mt-1"> <span><strong>Suica / ICOCA</strong>（Day 1、2、5 搭電鐵與勝尾寺公車）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-5" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-orange-700">大阪周遊卡 2日券憑證</strong>（Day 3、4 免費搭地鐵玩景點）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-6" class="check-item rounded text-red-800 mt-1"> <span><strong>日圓現金＋零錢包</strong>（6間神社參拜、勝尾寺達摩、章魚燒必備硬幣）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="id-7" class="check-item rounded text-red-800 mt-1"> <span><strong>海外信用卡 2 張以上</strong>（確認已開通海外刷卡與 OTP 驗證）</span></label>
                         </div>
                     </div>
-                    <div class="border p-3.5 rounded-xl bg-gray-50">
-                        <h3 class="font-bold text-gray-900 mb-2 border-b pb-1">🔌 3C 與生活必備</h3>
-                        <div class="space-y-2 text-gray-700">
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-1" class="check-item rounded text-red-800 mt-1"> <span>手機、日本上網卡 (eSIM/SIM) 與充電線</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-2" class="check-item rounded text-red-800 mt-1"> <span><strong>行動電源</strong>（隨身攜帶，不可托運）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-3" class="check-item rounded text-red-800 mt-1"> <span>多孔充電頭 / 零錢包 / 環保購物袋</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-4" class="check-item rounded text-red-800 mt-1"> <span>個人常備藥（腸胃藥、止痛藥、休足時間）</span></label>
-                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-5" class="check-item rounded text-red-800 mt-1"> <span>好走的運動鞋與輕便摺疊傘</span></label>
+
+                    <!-- 2. 3C 電力與虎航規定 -->
+                    <div class="border border-gray-200 p-3.5 rounded-xl bg-gray-50">
+                        <h3 class="font-bold text-gray-900 mb-2.5 border-b pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt text-amber-500"></i> 2. 3C 電力與虎航手提秤重
+                        </h3>
+                        <div class="space-y-2.5 text-gray-700 text-xs sm:text-sm">
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-1" class="check-item rounded text-red-800 mt-1"> <span><strong>行動電源 (限隨身最多2顆)</strong>（查地圖/刷條碼超耗電；⚠️虎航機上禁用且須放隨身包）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-2" class="check-item rounded text-red-800 mt-1"> <span><strong>手機 ＋ 日本上網 eSIM / SIM 卡</strong>（含退卡針）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-3" class="check-item rounded text-red-800 mt-1"> <span><strong>多孔快充頭 ＋ 長充電線</strong>（日本雙平腳插座免轉接頭）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="3c-4" class="check-item rounded text-red-800 mt-1"> <span><strong>隨身電子行李秤</strong>（虎航手提嚴格限重 10kg，Day 5 採買後回程前必秤）</span></label>
+                        </div>
+                    </div>
+
+                    <!-- 3. 行程專屬穿搭與戰利品裝備 -->
+                    <div class="border border-blue-100 p-3.5 rounded-xl bg-blue-50/40">
+                        <h3 class="font-bold text-blue-900 mb-2.5 border-b border-blue-100 pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shirt text-blue-600"></i> 3. 景點專屬穿搭 ＆ 動漫/羽球裝備
+                        </h3>
+                        <div class="space-y-2.5 text-gray-700 text-xs sm:text-sm">
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-1" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-blue-800">【Day 4 必備】好活動的長褲</strong>（通天閣溜滑梯＆高空漫步嚴禁穿裙子！）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-2" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-blue-800">好走的運動鞋 ＋ 5 雙厚襪</strong>（日行近2萬步，且通天閣設施禁穿涼拖鞋）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-3" class="check-item rounded text-red-800 mt-1"> <span><strong>防風連帽外套 / 輕羽絨</strong>（Day 2 勝尾寺山區、Day 3 聖瑪麗亞號海風與藍天大廈防風）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-4" class="check-item rounded text-red-800 mt-1"> <span><strong>薄長袖/短袖 5 套 ＋ 換洗內衣褲 ＋ 睡衣</strong>（15~23°C 洋蔥式穿搭）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-5" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-purple-800">A4 硬殼資料夾 / 保護套</strong>（收勝尾寺疊印明信片、hololive 與 Animate 動漫特典防折）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-6" class="check-item rounded text-red-800 mt-1"> <span><strong>可摺疊大旅行袋 ＋ 環保袋 2 個</strong>（裝 YONEX 羽球用品、Bic Camera 與 Day 5 超市戰利品）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="wear-7" class="check-item rounded text-red-800 mt-1"> <span><strong>御朱印帳</strong>（選帶：勝尾寺達摩御朱印、八坂神社獅子殿等6大名所）</span></label>
+                        </div>
+                    </div>
+
+                    <!-- 4. 醫藥、盥洗與抗疲勞救星 -->
+                    <div class="border border-gray-200 p-3.5 rounded-xl bg-gray-50">
+                        <h3 class="font-bold text-gray-900 mb-2.5 border-b pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-kit-medical text-red-600"></i> 4. 燒肉腸胃藥、盥洗與抗鐵腿小物
+                        </h3>
+                        <div class="space-y-2.5 text-gray-700 text-xs sm:text-sm">
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="med-1" class="check-item rounded text-red-800 mt-1"> <span><strong class="text-red-700">腸胃藥 / 消化酵素</strong>（Day 2 國產牛あぶりや、Day 4 燒肉力丸兩頓吃到飽必備！）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="med-2" class="check-item rounded text-red-800 mt-1"> <span><strong>休足時間 / 痠痛貼布</strong>（連走 5 天每晚貼小腿救星）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="med-3" class="check-item rounded text-red-800 mt-1"> <span><strong>止痛藥、感冒藥、OK繃與個人常備藥</strong></span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="med-4" class="check-item rounded text-red-800 mt-1"> <span><strong>牙刷牙膏、洗面乳、護唇膏</strong>（公寓飯店建議自備盥洗與保濕用品；>100ml 請放托運）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="med-5" class="check-item rounded text-red-800 mt-1"> <span><strong>隨身濕紙巾、面紙 ＋ 小垃圾袋</strong>（街頭吃章魚燒擦手＆裝隨身垃圾）</span></label>
+                            <label class="flex items-start space-x-2 cursor-pointer"><input type="checkbox" data-check="med-6" class="check-item rounded text-red-800 mt-1"> <span><strong>輕便晴雨摺疊傘</strong>（收合小於 60cm）</span></label>
                         </div>
                     </div>
                 </div>
@@ -1307,13 +1353,22 @@
             }
         }
 
-        // 更新行李檢查表進度顯示
+        // 更新行李檢查表進度顯示與進度條
         function updateChecklistProgress() {
             const checkboxes = document.querySelectorAll('.check-item');
+            const total = checkboxes.length;
             const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
             const progressEl = document.getElementById('checklist-progress');
+            const barEl = document.getElementById('checklist-bar');
             if (progressEl) {
-                progressEl.innerText = `進度 ${checkedCount}/${checkboxes.length}`;
+                progressEl.innerText = `進度 ${checkedCount}/${total}`;
+            }
+            if (barEl && total > 0) {
+                const pct = Math.round((checkedCount / total) * 100);
+                barEl.style.width = `${pct}%`;
+                barEl.className = pct === 100
+                    ? 'bg-green-600 h-2 rounded-full transition-all duration-300'
+                    : 'bg-red-700 h-2 rounded-full transition-all duration-300';
             }
         }
 
